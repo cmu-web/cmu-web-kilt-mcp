@@ -1,0 +1,1859 @@
+/* cmu-app.css: web-app components for the CMU web template. Load after the
+   template CSS and cmu-cms.css, then the app's own stylesheet.
+
+   Body classes: cmu-app on pages with the CMU header and footer, cmu-framed
+   on pages shown inside another tool (such as a learning platform) without
+   them. Both get every app style; cmu-framed also pads the page. */
+
+/* Pages framed by another tool: no CMU chrome */
+body.cmu-framed {
+  padding: 1.5rem;
+}
+
+/* Forms; see Page Setup and Forms in the docs (forms.html) */
+body:is(.cmu-app, .cmu-framed) fieldset > ul {
+  list-style-type: none;
+  margin: 0;
+}
+body:is(.cmu-app, .cmu-framed) fieldset > ul > li {
+  margin-left: 0;
+}
+/* A label right before a text box or menu, and a fieldset's legend: on their
+   own line, in small gray capitals like cmu-label. Checkbox and radio button
+   labels stay as they are, and so does a legend that asks a question (choice
+   rows, a question card, matching, sorting, a card sort). */
+body:is(.cmu-app, .cmu-framed)
+  label:has(
+    + select,
+    + textarea,
+    + input[type="text"],
+    + input[type="email"],
+    + input[type="search"],
+    + input[type="number"],
+    + input[type="date"],
+    + input[type="datetime-local"],
+    + .cmu-field-button
+  ),
+body:is(.cmu-app, .cmu-framed)
+  fieldset:not(.cmu-choices, .cmu-match, .cmu-question *, .cmu-card-sort *, :has(> .cmu-sort))
+  > legend {
+  display: block;
+  margin: 0 0 0.35em;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cmu-muted);
+}
+/* A legend that asks a question: bold, in sentence case (a question card
+   styles its own) */
+body:is(.cmu-app, .cmu-framed)
+  fieldset:is(.cmu-choices, .cmu-match, :has(> .cmu-sort)):not(.cmu-question *)
+  > legend {
+  display: block;
+  margin: 0 0 0.35em;
+  padding: 0;
+  font-weight: 700;
+}
+/* A group: a fieldset whose legend names fields in a row (Size: Width and
+   Height). The fields' own labels are quieter, in ordinary case. */
+body:is(.cmu-app, .cmu-framed) fieldset .cmu-field-row label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+body:is(.cmu-app, .cmu-framed) fieldset {
+  margin: 0 0 2em 0;
+  min-width: 0;
+} /* browsers default to min-content, which overflows narrow columns */
+body:is(.cmu-app, .cmu-framed) input[type="checkbox"],
+body:is(.cmu-app, .cmu-framed) input[type="radio"] {
+  max-width: 100%;
+  margin-right: 0.5em;
+}
+body:is(.cmu-app, .cmu-framed) select,
+body:is(.cmu-app, .cmu-framed) input[type="text"] {
+  width: 100%;
+  margin-bottom: 2em;
+}
+body:is(.cmu-app, .cmu-framed) select.inline,
+body:is(.cmu-app, .cmu-framed) input[type="text"].inline {
+  width: auto;
+  margin-bottom: 0;
+}
+/* Fields in one row, each with its label above (Width × Height, From and
+   To); they wrap onto more lines when the row is too narrow */
+body:is(.cmu-app, .cmu-framed) .cmu-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75em 1em;
+  margin: 0 0 2em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-field-row > div {
+  flex: 1 1 7em;
+  min-width: 0;
+}
+/* Short fields (numbers, codes) keep to 7em instead of sharing the row */
+body:is(.cmu-app, .cmu-framed) .cmu-field-row--short > div {
+  flex-grow: 0;
+}
+/* Field with a button: one text box and the button that acts on it, on one
+   line. The box takes the spare width (the template's 14px right cap
+   lifted, so the gap is only the gap). The button drops its top and bottom
+   padding, and flex stretches it to the box's height. */
+body:is(.cmu-app, .cmu-framed) .cmu-field-button {
+  display: flex;
+  gap: 0.5em;
+  margin: 0 0 2em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-field-button > input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+#content .cmu-field-button > .btn {
+  flex: none;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+/* max-width: the template caps inputs at calc(100% - 6px - .5em), which
+   leaves a gap in a border-box cell and pushes the separator off center */
+body:is(.cmu-app, .cmu-framed) .cmu-field-row :is(input, select) {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+/* A separator (×, to) padded like a text box, so it lines up with the boxes */
+body:is(.cmu-app, .cmu-framed) .cmu-field-row > span {
+  padding: 0.35em 0;
+  border: 1px solid transparent;
+  line-height: normal;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-field-row:has(+ p.cmu-hint) {
+  margin-bottom: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-field-row + p.cmu-hint {
+  padding: 0;
+  margin: 0.35rem 0 2rem;
+}
+
+/* Account: your name (or Sign In) beside the menu button; in the menu, name and Sign Out (or Sign In) */
+.roof .cmu-account {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 3.4em;
+  display: flex;
+  align-items: center;
+  max-width: 45%;
+  overflow: hidden;
+  line-height: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--cmu-ink);
+}
+/* Signed out, Sign In looks like the template's header links (header li a):
+   bold gray, red on hover. Signed in, the name is plain text. */
+.roof .cmu-account:not(.cmu-account-open) {
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.65);
+}
+.roof .cmu-account:not(.cmu-account-open):hover {
+  color: #c00;
+}
+/* On a red roof (roof red invert), white either way: dark text on red is hard to read */
+.roof.invert .cmu-account {
+  color: #fff;
+}
+.roof.invert .cmu-account:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+/* The name leaves the roof when the menu opens (as the menu button does);
+   the menu's account item has it instead. Below 768px the template's
+   wordmark fills the roof, so there it's only in the menu. */
+.menu-on .roof .cmu-account {
+  display: none;
+}
+/* With the template's search as well: search, then the account, then the
+   menu button. Both join the roof's flex row instead of sitting on top of
+   each other at the right. */
+.roof > div:has(> .cmu-account) > form.search {
+  position: relative;
+  right: auto;
+  margin-left: auto;
+  align-self: stretch;
+  height: auto;
+}
+.roof > div:has(> form.search) > .cmu-account {
+  position: static;
+  flex: 0 0 auto;
+  max-width: 12em;
+  margin: 0 3.4em 0 1.25em;
+}
+@media (max-width: 767px) {
+  .roof .cmu-account {
+    display: none;
+  }
+}
+/* The account block at the top of the menu: the name, then Preferences and
+   Sign Out side by side under it, the photo (if any) on the right, and a rule under it
+   that sets it apart from the menu's sections */
+nav#nav li.cmu-account-menu {
+  position: relative;
+  display: block;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+nav#nav li.cmu-account-menu > a {
+  display: inline-block;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-right: 0;
+}
+nav#nav li.cmu-account-menu > .cmu-account-name {
+  display: block;
+  padding-bottom: 0.4em;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+nav#nav li.cmu-account-menu:has(.cmu-avatar) > a {
+  max-width: calc(100% - 56px - 3rem); /* clear of the photo */
+}
+/* Preferences and Sign Out a step larger than the menu's links. The
+   template indents menu links 2em; at these larger sizes, scale it back so
+   the name and Preferences line up with the menu */
+nav#nav li.cmu-account-menu > .cmu-account-name ~ a {
+  margin-right: 0.5em;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+  font-size: 1.1em;
+}
+nav#nav li.cmu-account-menu > .cmu-account-name {
+  padding-left: calc(2em / 1.2);
+}
+/* A short line between Preferences and Sign Out, in the gap between them;
+   decoration, so screen readers skip it */
+nav#nav li.cmu-account-menu > .cmu-account-name ~ a ~ a {
+  position: relative;
+}
+nav#nav li.cmu-account-menu > .cmu-account-name ~ a ~ a::before {
+  content: "" / "";
+  position: absolute;
+  top: 30%;
+  bottom: 30%;
+  left: -0.3em;
+  border-left: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+}
+/* The indent goes outside Preferences, so its pressed and focus highlight
+   sits evenly around the word, as Sign Out's does */
+nav#nav li.cmu-account-menu > .cmu-account-name + a {
+  margin-left: calc(2em / 1.1 - 0.4em);
+}
+.cmu-account-name,
+.cmu-account-name:hover {
+  cursor: default;
+  color: inherit;
+}
+/* The signed-in user's photo (cmu-avatar): small and round before their
+   name in the roof, larger on the right of the menu's account block */
+.cmu-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.roof .cmu-account .cmu-avatar {
+  margin-right: 0.5em;
+}
+nav li.cmu-account-menu .cmu-avatar {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  transform: translateY(-50%);
+}
+
+/* Tabs: the one you're on is red and underlined, like the active nav tab */
+.cmu-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75em;
+  margin: 0 0 1.75em;
+  border-bottom: 1px solid var(--cmu-line);
+}
+#content .cmu-tabs a,
+#content .cmu-tabs a:hover {
+  margin-bottom: -1px;
+  padding-top: 0.2em; /* the template fixes padding-bottom at 1px */
+  line-height: 2.2;
+  border-bottom: 3px solid transparent;
+  color: var(--cmu-ink);
+  font-weight: 600;
+}
+#content .cmu-tabs a:hover {
+  color: var(--cmu-red);
+}
+#content .cmu-tabs a[aria-current="page"] {
+  color: var(--cmu-red);
+  border-bottom-color: var(--cmu-red);
+}
+/* Tab panels: button tabs (role="tab") that switch content in place, in the
+   link tabs' look; the template's button styles come off */
+#content .cmu-tabs [role="tab"] {
+  margin: 0 0 -1px;
+  padding: 0.2em 0 0;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--cmu-ink);
+  font: inherit;
+  font-weight: 600;
+  line-height: 2.2;
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+}
+#content .cmu-tabs [role="tab"]:hover {
+  background: none;
+  color: var(--cmu-red);
+}
+#content .cmu-tabs [role="tab"][aria-selected="true"] {
+  color: var(--cmu-red);
+  border-bottom-color: var(--cmu-red);
+}
+/* Folded tabs (a cmu-more inside the tabs), like a folded list: a "2 More"
+   cta at the end of the first row (the details box itself drops out of the
+   layout); opened, the rest wrap onto the next line and it says Show Fewer */
+.cmu-tabs-more {
+  display: contents;
+}
+/* Newer browsers wrap a details' contents in ::details-content, which would
+   keep the folded tabs off the tabs' row; take it out of the layout too, and
+   hide the folded tabs ourselves while closed */
+.cmu-tabs-more::details-content {
+  display: contents;
+}
+.cmu-tabs-more:not([open]) > div {
+  display: none;
+}
+.cmu-tabs-more summary {
+  margin: 0;
+  padding: 0.2em 0 0;
+  line-height: 2.2;
+}
+.cmu-tabs-more > div {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.75em;
+}
+
+/* Small text */
+.cmu-muted,
+.cmu-hint {
+  color: var(--cmu-muted);
+}
+.cmu-hint {
+  font-size: 0.85em;
+}
+/* A hint right under its field: the template's space below the field moves
+   below the hint, and the template's padding on every <p> goes */
+body:is(.cmu-app, .cmu-framed) :is(input, select, textarea):has(+ p.cmu-hint) {
+  margin-bottom: 0;
+}
+body:is(.cmu-app, .cmu-framed) :is(input, select, textarea, fieldset > ul) + p.cmu-hint {
+  padding: 0;
+  margin: 0.35rem 0 2rem;
+}
+body:is(.cmu-app, .cmu-framed) fieldset > ul + p.cmu-hint:last-child,
+body:is(.cmu-app, .cmu-framed) fieldset > p.cmu-hint:last-child {
+  margin-bottom: 0;
+}
+/* Options that belong to one choice: inside its list item, lined up with
+   its label, shown only while its radio button or checkbox is picked */
+body:is(.cmu-app, .cmu-framed) .cmu-sub-options {
+  margin: 0.6em 0 0.9em 1.65em;
+}
+body:is(.cmu-app, .cmu-framed)
+  li:has(> input:is([type="radio"], [type="checkbox"]):not(:checked))
+  > .cmu-sub-options {
+  display: none;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-sub-options :is(select, input[type="text"]) {
+  margin-bottom: 0.75em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-sub-options > ul {
+  list-style-type: none;
+  margin: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-sub-options > ul > li {
+  margin-left: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-sub-options > ul + p.cmu-hint {
+  padding: 0;
+  margin: 0.35rem 0 0;
+}
+/* Choice rows: each radio button or checkbox with its label in a large row,
+   the whole row a target, for a question with a few answers; see Choice Rows
+   in the docs (forms.html) */
+.cmu-choices ul {
+  margin: 0;
+  padding: 0;
+}
+.cmu-choices li {
+  list-style: none;
+  margin: 0 0 0.6em;
+  padding: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-choices label {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 0;
+  padding: 0.85em 1em;
+  border: 1px solid var(--cmu-line);
+  background: #fff;
+  font-weight: 400;
+  cursor: pointer;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-choices input {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  margin: 0;
+}
+.cmu-choices label:hover {
+  background: var(--cmu-tint);
+}
+.cmu-choices label:has(:checked) {
+  border-color: var(--cmu-red);
+  background: var(--cmu-red-tint);
+}
+/* Inside the row, so a list or box around it doesn't clip the ring */
+.cmu-choices label:has(:focus-visible) {
+  outline: 2px solid var(--cmu-red);
+  outline-offset: -3px;
+}
+/* A question card: one question and its choice rows on a white card, with a
+   rule under the question; put it in a colored band. Its buttons: back on
+   the left, forward (Next, or Submit on the last question) on the right */
+.cmu-question {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2em 2.5em;
+  background: #fff;
+  color: var(--cmu-ink);
+}
+body:is(.cmu-app, .cmu-framed) .cmu-question legend {
+  width: 100%;
+  margin-bottom: 1.25em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--cmu-ink);
+  font-size: 1.1em;
+  font-weight: 400;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-question fieldset {
+  margin-bottom: 0.75rem;
+}
+.cmu-question > :last-child {
+  margin-bottom: 0;
+}
+/* Three columns: the back arrow on the left, the forward arrow on the
+   right and Submit, on the last question, centered, away from where people
+   have been clicking forward */
+.cmu-question-buttons {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-question-buttons > .cmu-question-back {
+  grid-column: 1;
+  justify-self: start;
+}
+.cmu-question-buttons > [type="submit"] {
+  grid-column: 2;
+}
+.cmu-question-buttons > :not(.cmu-question-back, [type="submit"]) {
+  grid-column: 3;
+  justify-self: end;
+}
+@media (max-width: 767px) {
+  .cmu-question {
+    padding: 1.25em;
+  }
+}
+
+/* Matching: each item and a menu of answers beside it, drawn as two puzzle
+   pieces: the item has a socket on its right, the menu a tab on its left.
+   Once an answer is picked, the pieces snap together. Under 600px the menu
+   goes under its item, without the puzzle shapes. See Matching in the docs
+   (forms.html) */
+.cmu-match ul {
+  margin: 0;
+  padding: 0;
+}
+.cmu-match li {
+  --cmu-piece: #e4909c; /* the pieces' colored ends, red once matched */
+  list-style: none;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 2.5em;
+  margin: 0 0 1em;
+  padding: 0;
+  transition: column-gap 0.2s;
+}
+.cmu-match li:has(option:checked:not([value=""])) {
+  --cmu-piece: var(--cmu-red);
+  column-gap: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-match li > label,
+body:is(.cmu-app, .cmu-framed) .cmu-match li > select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-height: 4.5em;
+  margin: 0;
+  border: 1px solid var(--cmu-line);
+  background-color: #fff;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-match li > label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.75em 1.75em 0.75em 1em;
+  border-left: 1.25em solid var(--cmu-piece);
+  font-weight: 400;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-match li > select {
+  padding: 0.75em 1em 0.75em 1.75em;
+  border-right: 1.25em solid var(--cmu-piece);
+}
+/* The socket: a half circle cut into the item's right edge */
+.cmu-match label::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  box-sizing: border-box;
+  width: 0.9em;
+  height: 1.8em;
+  margin-top: -0.9em;
+  border: 1px solid var(--cmu-line);
+  border-right: 0;
+  border-radius: 0.9em 0 0 0.9em;
+  background: #fff;
+}
+/* The tab: a half circle on the menu's left edge, into the socket */
+.cmu-match li::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 1.25em - 0.9em);
+  box-sizing: border-box;
+  width: calc(0.9em + 1px); /* over the menu's left border */
+  height: 1.8em;
+  margin-top: -0.9em;
+  border: 1px solid var(--cmu-line);
+  border-right: 0;
+  border-radius: 0.9em 0 0 0.9em;
+  background: #fff;
+  pointer-events: none;
+  transition: left 0.2s;
+}
+.cmu-match li:has(option:checked:not([value=""]))::after {
+  left: calc(50% - 0.9em);
+}
+@media (max-width: 600px) {
+  .cmu-match li,
+  .cmu-match li:has(option:checked:not([value=""])) {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+  .cmu-match label::after,
+  .cmu-match li::after {
+    display: none;
+  }
+  body:is(.cmu-app, .cmu-framed) .cmu-match li > label {
+    min-height: 0;
+    border-bottom: 0;
+  }
+  body:is(.cmu-app, .cmu-framed) .cmu-match li > select {
+    min-height: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmu-match li,
+  .cmu-match li::after {
+    transition: none;
+  }
+}
+
+/* Card sort: each card, a white card with its words, gets one of a few
+   groups, picked from large tiles under it (radio buttons). See Card Sort
+   in the docs (forms.html) */
+/* Cards up to 20rem wide, centered when they don't fill the row */
+.cmu-card-sort {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 20rem));
+  justify-content: center;
+  gap: 1.5em;
+}
+/* Cards in a row are the same height, with the tiles at the bottom */
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort > fieldset {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 2em 1.5em 1.5em;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  text-align: center;
+}
+/* The card's words: the fieldset's legend, inside the card */
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort > fieldset > legend {
+  float: left;
+  width: 100%;
+  margin: 0 0 1.75em;
+  font-size: 1.15em;
+  line-height: 1.45;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort > fieldset > ul {
+  clear: both;
+  display: grid;
+  gap: 0.75em;
+  margin: auto 0 0;
+  padding: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort > fieldset > ul > li {
+  margin: 0;
+  padding: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort label {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 1.5em 1em;
+  background: var(--cmu-tint);
+  color: var(--cmu-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+/* The radio button stays in the tile for keyboards, out of sight */
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort input {
+  position: absolute;
+  opacity: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort label:hover {
+  background: var(--cmu-gray-tint);
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort label:has(:checked) {
+  background: var(--cmu-red);
+  color: #fff;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-card-sort label:has(:focus-visible) {
+  outline: 2px solid var(--cmu-ink);
+  outline-offset: 2px;
+}
+
+/* Sorting (uses cmu-app.js): an ordered list people put in order with up and
+   down arrow buttons the script adds to each item, numbered in red. See Sorting in
+   the docs (forms.html) */
+ol.cmu-sort {
+  counter-reset: cmu-sort;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ol.cmu-sort > li {
+  counter-increment: cmu-sort;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 0 0 0.6em;
+  padding: 0.6em 0.75em 0.6em 1em;
+  border: 1px solid var(--cmu-line);
+  background: #fff;
+}
+ol.cmu-sort > li::before {
+  content: counter(cmu-sort);
+  flex: none;
+  min-width: 1.25em;
+  color: var(--cmu-red);
+  font-weight: 700;
+}
+.cmu-sort-moves {
+  display: flex;
+  flex: none;
+  gap: 0.4em;
+  margin-left: auto;
+}
+.cmu-sort-moves .btn {
+  margin: 0;
+}
+/* The first item can't go up, and the last can't go down */
+.cmu-sort-moves .btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* A short note beside a button, centered on it; wraps under it when narrow */
+.cmu-button-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 1em;
+  margin: 0 0 1.5em;
+}
+.cmu-button-note > * {
+  margin: 0;
+}
+.cmu-button-note > p {
+  padding: 0;
+}
+/* Right under a photo, it acts on that photo: close to it, room after */
+figure.image:has(+ .cmu-button-note) {
+  padding-bottom: 0.75rem;
+}
+.cmu-empty {
+  text-align: center;
+  color: var(--cmu-muted);
+  padding: 1.25em;
+}
+/* Codes (departments, course numbers) kept on one line */
+.cmu-code {
+  white-space: nowrap;
+}
+
+/* Acting as another user (an admin seeing the app as someone else): a thick
+   frame around the window and a bar fixed along its bottom edge, both in
+   the template's teal, so the session is never mistaken for your own. Put
+   cmu-acting-as on <body> and the bar anywhere inside it. (Fixed, not
+   sticky: on wide screens the template makes <body> one window tall.) */
+:root {
+  --cmu-acting: #008285;
+}
+body.cmu-acting-as {
+  padding-bottom: 4.5em;
+}
+body.cmu-acting-as::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  border: 6px solid var(--cmu-acting);
+  pointer-events: none;
+  z-index: 2000;
+}
+body.cmu-acting-as .cmu-acting-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1999;
+}
+.cmu-acting-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em 1.25em;
+  margin: 0;
+  padding: 0.6em 1em;
+  background: var(--cmu-acting);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+.cmu-acting-bar p {
+  margin: 0;
+  padding: 0;
+}
+.cmu-acting-bar .btn.ghost {
+  margin: 0;
+  color: #fff;
+  border-color: #fff;
+}
+.cmu-acting-bar .btn.ghost:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+body.cmu-acting-as .scrolltop {
+  bottom: 5em;
+}
+@media (max-width: 600px) {
+  body.cmu-acting-as {
+    padding-bottom: 7em;
+  }
+}
+
+/* Flash messages: the result of what someone just did, shown once. Standing
+   announcements are the template's own color bands instead. */
+.cmu-flash {
+  margin: 1em 0;
+  border-left: 4px solid;
+}
+/* Equal padding even on a p (see .cmu-note in cmu-cms.css) */
+:is(#content, body) .cmu-flash {
+  padding: 0.75em 1em;
+}
+.cmu-flash--error {
+  background: var(--cmu-red-tint);
+  color: var(--cmu-red);
+}
+.cmu-flash--success {
+  background: var(--cmu-green-tint);
+  color: var(--cmu-green);
+}
+.cmu-flash--notice {
+  background: var(--cmu-amber-tint);
+  border-color: var(--cmu-gold);
+  color: var(--cmu-amber);
+}
+
+/* A <button class="btn"> where a form needs one, such as a sign-in that
+   must POST: wide fills its line, as a.btn.wide does, and in a heading
+   (<h4> on a red box) it takes the heading's type, as a link would */
+button.btn.wide {
+  display: block;
+  width: 100%;
+}
+:is(h1, h2, h3, h4, h5, h6) button.btn {
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+/* Buttons that look like links (POST actions next to plain links): the
+   template's link color and its 1px rule, with line-height: normal so the
+   rule sits where a link's does */
+.cmu-link-button {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid;
+  padding: 0 0 1px;
+  margin: 0;
+  font: inherit;
+  line-height: normal;
+  color: var(--cmu-link);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+.cmu-link-button:hover {
+  background: none;
+  color: var(--cmu-link-hover);
+}
+.invert .cmu-link-button {
+  color: inherit;
+}
+
+/* Dialog (<dialog>), with a file drop zone and buttons at the bottom */
+.cmu-dialog {
+  width: min(32em, calc(100vw - 2em));
+  box-sizing: border-box;
+  padding: 1.5em;
+  border: 1px solid var(--cmu-line);
+  background: #fff;
+  color: var(--cmu-ink);
+}
+/* Page rules such as "last child has no bottom margin" would pull it off center */
+.cmu-dialog:modal {
+  margin: auto;
+}
+.cmu-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+/* A box's closing buttons (dialog, framed panel, question card) sit under a
+   rule: it says they finish the whole box. Loose buttons in a page get none. */
+.cmu-dialog-buttons {
+  display: flex;
+  gap: 0.5em;
+  margin: 1.25em 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-dialog-buttons .btn {
+  margin: 0;
+}
+/* File drop zone / picker: a label wrapping a file input, so it works by
+   click and keyboard as well as by dragging (cmu-app.js handles the drag).
+   Icon: Bootstrap Icons
+   file-earmark-arrow-up, MIT license, Copyright (c) 2019-2024 The Bootstrap
+   Authors. */
+.cmu-drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-height: 12rem;
+  margin: 1em 0 0.5em;
+  padding: 2.5em 1.5em;
+  box-sizing: border-box;
+  border: 2px dashed var(--cmu-line);
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+  cursor: pointer;
+}
+.cmu-drop::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  background: var(--cmu-muted);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707z'/%3E%3Cpath d='M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+/* The real file input stays focusable for keyboards but out of sight */
+.cmu-drop input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  opacity: 0;
+}
+.cmu-drop > span:not(.cmu-drop-file) {
+  color: var(--cmu-ink);
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+.cmu-drop-pick {
+  color: var(--cmu-red);
+  text-decoration: underline;
+}
+.cmu-drop-over,
+.cmu-drop:focus-within {
+  border-color: var(--cmu-red);
+  border-style: solid;
+}
+.cmu-drop-over::before,
+.cmu-drop:focus-within::before {
+  background: var(--cmu-red);
+}
+.cmu-drop-has-file {
+  border-style: solid;
+}
+.cmu-drop-has-file::before {
+  background: var(--cmu-green);
+}
+.cmu-drop-file {
+  display: block;
+  color: var(--cmu-green);
+  font-weight: 700;
+  word-break: break-all;
+}
+/* The file's line keeps its place while empty, so choosing a file doesn't
+   move the zone; a long name stays on one line, cut short with an ellipsis
+   (the script puts the whole name in its title), instead of widening it */
+.cmu-drop > .cmu-drop-file {
+  display: block;
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: normal;
+}
+.cmu-drop > .cmu-drop-file:empty::before {
+  content: "\200b"; /* a zero-width space, so the empty line is a line tall */
+}
+/* Wide enough: the icon on the left, then the words and the file's name,
+   left-aligned, with a line between */
+@media (min-width: 480px) {
+  .cmu-drop {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr auto auto 1fr;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    gap: 0 1.75rem;
+    text-align: left;
+  }
+  .cmu-drop::before {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+  .cmu-drop > span:not(.cmu-drop-file) {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+    padding: 0.25rem 0 0.15rem 1.75rem;
+    border-left: 1px solid var(--cmu-line);
+  }
+  .cmu-drop > .cmu-drop-file {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: stretch;
+    padding: 0 0 0.35rem 1.75rem;
+    border-left: 1px solid var(--cmu-line);
+  }
+}
+/* The drop zone and the ID tap stay about a form's width, so their few
+   words don't float in a page-wide box */
+.cmu-drop,
+.cmu-tap-target {
+  max-width: 36rem;
+}
+/* In a dialog, the drop zone and the ID tap are a little shorter */
+.cmu-dialog :is(.cmu-drop, .cmu-tap-target) {
+  min-height: 9rem;
+}
+
+/* Progress: a headline number and bars */
+.cmu-stat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25em;
+  margin: 1em 0;
+  padding: 1em 1.25em;
+  border: 1px solid var(--cmu-line);
+}
+.cmu-stat-value {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+.cmu-stat-sub {
+  font-size: 0.85em;
+  color: var(--cmu-muted);
+}
+.cmu-stat > .cmu-meter {
+  flex: 1;
+  height: 12px;
+}
+/* Divs, not spans: the template script strips style="" from spans */
+.cmu-meter {
+  display: inline-block;
+  vertical-align: middle;
+  width: 8em;
+  height: 10px;
+  background: #e8eaec;
+}
+.cmu-meter > div {
+  display: block;
+  height: 100%;
+  background: var(--cmu-green-fill);
+}
+.cmu-pct {
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 0.5em;
+}
+.cmu-pct--high {
+  color: var(--cmu-green);
+}
+.cmu-pct--mid {
+  color: var(--cmu-amber);
+}
+.cmu-pct--low {
+  color: var(--cmu-red);
+}
+/* Per-item rows under the headline */
+.cmu-breakdown {
+  flex-basis: 100%;
+  list-style: none;
+  margin: 0.5em 0 0;
+  padding: 0.75em 0 0;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-breakdown li {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin: 0.35em 0;
+}
+.cmu-breakdown .cmu-code {
+  min-width: 4em;
+}
+.cmu-breakdown .cmu-pct {
+  margin: 0;
+  min-width: 3em;
+}
+/* More rows folded under a breakdown, in a details.cmu-more; see Progress in
+   the docs (messages.html) */
+.cmu-breakdown-more {
+  flex-basis: 100%;
+  margin-top: 0.5em;
+  padding-top: 0.75em;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-breakdown-more .cmu-breakdown {
+  border-top: 0;
+}
+
+/* A meter across its whole box, and white on a colored box (invert) */
+.cmu-meter--full {
+  display: block;
+  width: 100%;
+}
+.invert .cmu-meter {
+  background: rgba(255, 255, 255, 0.35);
+}
+.invert .cmu-meter > div {
+  background: #fff;
+}
+/* In a sidebar box, a meter is a bar, not one of the template's padded boxes */
+.content .sidebar .cmu-meter,
+.content .sidebar .cmu-meter > div {
+  margin: 0;
+  padding: 0;
+}
+/* A label on a colored box takes the box's white */
+.invert .cmu-label {
+  color: inherit;
+}
+
+/* Course outline: the parts of a course or task in order, each done, current or not
+   started, with a marker on the right; see Course Outline in the docs
+   (messages.html) */
+.cmu-outline {
+  list-style: none;
+  margin: 0 0 1.5em;
+  padding: 0;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-outline > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--cmu-line);
+  border-left: 4px solid transparent;
+}
+:is(#content, body) .cmu-outline > li > a:not(.btn):not(.cta):not(.box):not(.scrolldown),
+.cmu-outline > li > span {
+  display: block;
+  padding: 1em 3em 1em 1em;
+  border: 0;
+  color: var(--cmu-ink);
+}
+:is(#content, body) .cmu-outline > li > a:not(.btn):not(.cta):not(.box):not(.scrolldown):hover {
+  background: var(--cmu-tint);
+}
+.cmu-outline > li::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1em;
+  box-sizing: border-box;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: -0.575em;
+  border: 2px solid #b9bfc5;
+  border-radius: 50%;
+}
+.cmu-outline > li.cmu-outline-current {
+  border-left-color: var(--cmu-red);
+  font-weight: 700;
+}
+.cmu-outline > li.cmu-outline-current::after {
+  border-color: var(--cmu-red);
+  border-right-color: transparent;
+}
+.cmu-outline > li.cmu-outline-done::after {
+  border-color: var(--cmu-red);
+  background: var(--cmu-red)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 80% no-repeat;
+}
+
+/* Folded long lists (<details class="cmu-more">): the summary reads as a
+   line of text ending in a bold toggle, the count of what's hidden ("6
+   More") or Show Fewer (cmu-more-closed / cmu-more-open). A plain space in
+   the markup separates the text and the toggle. The toggle ends in a down
+   chevron that flips up when open, so it reads as opening here, not as a
+   cta to another page; it keeps the cta class from older markup, but its
+   look comes from here. The chevron is drawn heavy, to match the bold. */
+.cmu-more summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--cmu-muted);
+}
+.cmu-more summary::-webkit-details-marker {
+  display: none;
+}
+.cmu-more .cmu-more-link {
+  color: var(--cmu-gray);
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cmu-more .cmu-more-link::after,
+.ios .cmu-more .cmu-more-link.cta::after {
+  content: "";
+  position: static;
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-left: 0.35em;
+  font-size: inherit;
+  vertical-align: -0.05em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 5.5 8 11l5.5-5.5' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transition: transform 0.15s;
+}
+.cmu-more[open] .cmu-more-link::after {
+  transform: rotate(180deg);
+}
+.cmu-more summary:hover .cmu-more-link {
+  color: var(--cmu-red);
+}
+/* The template paints a pressed or focused summary like a focused link (red
+   background, white text). A click gets none of that; the keyboard gets a
+   plain red ring. */
+#content .cmu-more > summary:is(:active, :focus) {
+  background: none !important;
+  color: var(--cmu-muted) !important;
+  outline: none !important;
+}
+#content .cmu-more > summary:focus-visible {
+  outline: 2px solid var(--cmu-red) !important;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmu-more .cmu-more-link::after {
+    transition: none;
+  }
+}
+.cmu-more .cmu-more-open,
+.cmu-more[open] .cmu-more-closed {
+  display: none;
+}
+.cmu-more[open] .cmu-more-open {
+  display: inline;
+}
+
+/* Long results: a count under the list, then either Load More or a pager.
+   Load More is a ghost btn half the width of the page, like the template's
+   .loadmore; full width on phones. */
+.cmu-results-count {
+  text-align: center;
+  color: var(--cmu-muted);
+  margin: 1.5em 0 0;
+}
+.cmu-load-more {
+  text-align: center;
+  margin: 0.75em 0 0;
+}
+.cmu-load-more .btn {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+}
+/* Pager (<div class="cmu-pager" role="navigation">; not <nav>, whose links
+   the template strips of borders): one list of first, previous, the page
+   numbers, next and last. The current page has aria-current="page"; an
+   arrow that goes nowhere has no href and aria-disabled="true". On phones
+   the first and last arrows (cmu-pager-end) give way to the numbers. */
+.cmu-pager {
+  margin: 0.75em 0 0;
+}
+.cmu-pager ol {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.25em;
+}
+/* (#content: the template indents an ol's 10th item on, for two-digit numbers) */
+#content .cmu-pager li {
+  margin: 0;
+  padding: 0;
+}
+#content .cmu-pager a,
+.cmu-pager span {
+  display: block;
+  box-sizing: border-box;
+  min-width: 2.25em;
+  padding: 0.3em 0.35em;
+  text-align: center;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  text-decoration: none;
+}
+#content .cmu-pager a[href]:hover {
+  border-color: var(--cmu-line);
+}
+#content .cmu-pager a[aria-current="page"] {
+  background: var(--cmu-red);
+  border-color: var(--cmu-red);
+  color: #fff;
+  font-weight: 700;
+}
+#content .cmu-pager a[aria-disabled="true"] {
+  color: var(--cmu-muted);
+  opacity: 0.45;
+  cursor: default;
+}
+.cmu-pager .cmu-pager-arrow {
+  font-weight: 700;
+}
+.cmu-pager span {
+  color: var(--cmu-muted);
+}
+@media (max-width: 600px) {
+  .cmu-pager .cmu-pager-end {
+    display: none;
+  }
+  .cmu-pager ol {
+    gap: 0.1em;
+  }
+  #content .cmu-pager a,
+  .cmu-pager span {
+    min-width: 1.9em;
+    padding: 0.3em 0.15em;
+  }
+  .cmu-load-more .btn {
+    width: 100%;
+  }
+}
+
+/* Tables: the template's table.alternate (cells centered vertically in
+   cmu-cms.css), plus numeric and fitted columns. */
+table.alternate th.num,
+table.alternate td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cmu-fit {
+  width: 1%;
+  white-space: nowrap;
+}
+/* Sortable headers: the header text is the button */
+th[data-sort-key] .cmu-sort {
+  all: unset;
+  cursor: pointer;
+  font-weight: inherit;
+  white-space: nowrap;
+}
+th[data-sort-key] .cmu-sort:hover {
+  color: #c00;
+}
+th[data-sort-key] .cmu-sort:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+th[aria-sort] .cmu-sort {
+  color: #c00;
+}
+.cmu-sort-arrow {
+  font-size: 0.7em;
+  vertical-align: 0.15em;
+}
+/* Row checkbox: the whole cell is its click target. The label fills the
+   cell, so it has no width of its own to hold the column open: the side
+   padding plus min-width (the box) do that. */
+table .cmu-select-cell {
+  position: relative;
+  padding: 0 0.85em;
+  text-align: center;
+  vertical-align: top;
+  min-width: 1.15em;
+}
+.cmu-select-cell label {
+  position: absolute;
+  inset: 0;
+  padding-top: 0.6em;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.cmu-select-cell input[type="checkbox"] {
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0;
+  cursor: pointer;
+}
+/* The template gives checkboxes a right margin, which pushes this one off center */
+/* beats the app's margin-right on checkboxes */
+table .cmu-select-cell label input[type="checkbox"] {
+  margin: 0;
+}
+#content table.alternate td.cmu-select-cell label {
+  padding-top: 0;
+  align-items: center;
+}
+
+/* Filter rows above a list */
+/* Search over a list: a sentence saying what you can search by, then a
+   full-width box whose <label> is for screen readers (sr-only) */
+.cmu-search-bar {
+  margin-bottom: 0.5em;
+}
+.cmu-search-bar p {
+  margin: 0 0 0.5em;
+}
+.cmu-search-bar input[type="text"],
+body:is(.cmu-app, .cmu-framed) .cmu-search-bar input[type="text"] {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* People list: a small round headshot beside each name and title, as on
+   CMU's experts page. Pair it with filters for a long list. */
+#content .cmu-people,
+.cmu-people {
+  list-style: none;
+  margin: 0 0 1.5em;
+  padding: 0;
+}
+#content .cmu-people > li {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin: 0;
+  padding: 0.75em 0;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-people img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.cmu-people p + p {
+  color: var(--cmu-muted);
+  font-size: 0.9em;
+}
+
+/* Groups line up at the top, so their labels share one line; checkboxes
+   sit level with a text box beside them (its height, centered) */
+.cmu-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1em 1.5em;
+  margin-bottom: 1em;
+}
+.cmu-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+/* A group with a text box takes the row's spare width, so the box isn't only
+   as wide as its label */
+.cmu-filter-group:has(> input:is([type="text"], [type="search"])) {
+  flex: 1 1 16em;
+}
+.cmu-filter-group > input:is([type="text"], [type="search"]) {
+  width: 100%;
+  box-sizing: border-box;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-filter-group > .cmu-label {
+  margin: 0;
+} /* beats the form label rule above */
+.cmu-filter-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75em;
+  min-height: 2.2em;
+}
+.cmu-filter-checks label {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-filter-group input[type="text"] {
+  min-width: 15em;
+  margin: 0;
+}
+
+/* Bulk bar: a tinted band on top of a table, the selection count then the
+   actions. Its height is fixed so buttons appearing don't nudge the table. */
+.cmu-bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 0.75em;
+  min-height: 3.5em;
+  padding: 0.5em 0.75em;
+  background: var(--cmu-tint);
+  border: 1px solid var(--cmu-line);
+  border-bottom: 0;
+}
+.cmu-bulk-bar .cmu-selection-count {
+  color: var(--cmu-muted);
+  margin-right: 0.5em;
+}
+.cmu-bulk-bar .cmu-selection-count.cmu-has-selection {
+  color: var(--cmu-ink);
+  font-weight: 600;
+}
+.cmu-bulk-bar .btn {
+  margin: 0;
+}
+/* The template gives tables a top margin; the bar sits right on the table */
+#content .cmu-bulk-bar + table,
+#content .cmu-bulk-bar + * table:first-child {
+  margin-top: 0;
+}
+
+/* Row buttons: the bulk bar's small buttons in a table cell, one fixed
+   width alone or in a pair, as tall as a two-line button (2 lines, padding,
+   border) so rows don't change height with the label. Keep two-word
+   phrases together with &nbsp;. */
+.cmu-row-buttons {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 8.5em;
+  justify-content: start;
+  gap: 0.4em;
+}
+.cmu-row-buttons form {
+  margin: 0;
+}
+.cmu-row-buttons .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: calc(3.2em + 4px);
+  margin: 0;
+  text-align: center;
+  white-space: normal;
+}
+/* Line height for wrapped labels (the template's is 1, with an id
+   selector); slimmer sides so short labels fit on one line */
+#content .cmu-row-buttons .btn {
+  line-height: 1.25;
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+}
+/* Below 1200px a wide table has no room: pills may wrap, and a pair stacks,
+   each label on one line */
+@media (max-width: 1199px) {
+  td .cmu-pill {
+    white-space: normal;
+  }
+  .cmu-row-buttons {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+  }
+  td .cmu-row-buttons .btn {
+    white-space: nowrap;
+    min-height: 0;
+  }
+}
+
+/* Row menu: a row's other actions behind a square outlined ⋯ button, after
+   the row's one main button. cmu-app.js opens it under the button, one at a
+   time; a click elsewhere or Escape closes it. Icon: Bootstrap Icons
+   three-dots, MIT license, Copyright (c) 2019-2024 The Bootstrap Authors. */
+.cmu-row-menu {
+  position: relative;
+}
+.cmu-row-buttons:has(.cmu-row-menu) {
+  grid-auto-flow: column;
+  grid-template-columns: 8.5em calc(3.2em + 4px);
+  grid-auto-columns: unset;
+}
+#content .cmu-row-buttons .cmu-row-menu > .btn {
+  padding: 0;
+}
+.cmu-row-menu > .btn::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.cmu-row-menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 14em;
+  padding: 0.3em 0;
+  background: #fff;
+  border: 1px solid var(--cmu-line);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+.cmu-row-menu-list form {
+  margin: 0;
+}
+#content .cmu-row-menu-list :is(button, a) {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.6em 1em;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  color: var(--cmu-ink);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-align: left;
+  text-decoration: none;
+  text-transform: none;
+  cursor: pointer;
+}
+#content .cmu-row-menu-list :is(button, a):is(:hover, :focus-visible) {
+  background: var(--cmu-tint);
+}
+
+/* ID tap: a large target where an NFC card reader, which types like a
+   keyboard, enters an ID card's number and a carriage return. The field inside
+   is hidden but keeps focus (cmu-app.js); the target says Ready while it has
+   it, and to select it when it doesn't, so a tap never goes nowhere; after a
+   tap, cmu-tap-result says who it found. All three share one spot, sized for
+   the longest, so the target never shifts as they change. A folded search
+   under it is the way in without a card.
+   Icon: Bootstrap Icons person-vcard, MIT license, Copyright (c) 2019-2024
+   The Bootstrap Authors. */
+.cmu-tap-target {
+  position: relative;
+  display: grid;
+  grid-template-areas: "picture" "label" "message";
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-content: center;
+  gap: 0.4em;
+  min-height: 12rem;
+  padding: 2.5em 1.5em;
+  box-sizing: border-box;
+  border: 2px dashed var(--cmu-line);
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+  cursor: text;
+}
+/* Listening: solid and green, like Ready */
+.cmu-tap-target:focus-within {
+  border-color: var(--cmu-green);
+  border-style: solid;
+}
+.cmu-tap-target::before {
+  content: "";
+  grid-area: picture;
+  width: 48px;
+  height: 48px;
+  background: var(--cmu-muted);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5'/%3E%3Cpath d='M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96q.04-.245.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.cmu-tap-target:focus-within::before {
+  background: var(--cmu-green);
+}
+/* With a picture of the card (cmu-tap-card), it takes the icon's place */
+.cmu-tap-target:has(.cmu-tap-card)::before {
+  display: none;
+}
+.cmu-tap-card {
+  grid-area: picture;
+  display: block;
+  width: 13rem;
+  max-width: 60%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(23, 44, 75, 0.15);
+}
+body:is(.cmu-app, .cmu-framed) .cmu-tap-target > label {
+  grid-area: label;
+  margin: 0;
+  color: var(--cmu-ink);
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: normal;
+  text-transform: none;
+}
+/* The field is there for the reader to type into, and for screen readers,
+   but never shown: the target and its Ready say whether it's listening */
+body:is(.cmu-app, .cmu-framed) .cmu-tap-target > input,
+.cmu-tap-target > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+/* The tap waves before the label: Bootstrap Icons wifi, turned on its side
+   (MIT license, Copyright (c) 2019-2024 The Bootstrap Authors) */
+.cmu-tap-target > label::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.35em;
+  vertical-align: -0.1em;
+  background: var(--cmu-muted);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg transform='rotate(90 8 8)'%3E%3Cpath d='M15.384 6.115a.485.485 0 0 0-.047-.736A12.44 12.44 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.52.52 0 0 0 .668.05A11.45 11.45 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049'/%3E%3Cpath d='M13.229 8.271a.482.482 0 0 0-.063-.745A9.46 9.46 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.576 1.336c.206.132.48.108.653-.065m-2.183 2.183c.226-.226.185-.605-.1-.75A6.5 6.5 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.407.19.611.09A5.5 5.5 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.61-.091zM9.06 12.44c.196-.196.198-.52-.04-.66A2 2 0 0 0 8 11.5a2 2 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .707 0l.707-.707z'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.cmu-tap-target:focus-within > label::before {
+  background: var(--cmu-green);
+}
+/* Wide enough: the card or icon on the left, then the label and Ready,
+   left-aligned, with a line between */
+@media (min-width: 480px) {
+  .cmu-tap-target {
+    grid-template-areas: "picture ." "picture label" "picture message" "picture .";
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr auto auto 1fr;
+    justify-content: center;
+    justify-items: stretch;
+    align-items: center;
+    gap: 0 1.75rem;
+    text-align: left;
+  }
+  .cmu-tap-target > .cmu-tap-card {
+    max-width: none;
+  }
+  body:is(.cmu-app, .cmu-framed) .cmu-tap-target > label,
+  .cmu-tap-target > label {
+    align-self: stretch;
+    padding: 0.25rem 0 0.15rem 1.75rem;
+    border-left: 1px solid var(--cmu-line);
+  }
+  .cmu-tap-target > :is(.cmu-tap-ready, .cmu-tap-paused, .cmu-tap-result) {
+    align-self: stretch;
+    padding: 0 0 0.35rem 1.75rem;
+    border-left: 1px solid var(--cmu-line);
+  }
+}
+/* In a dialog, the target is most of it */
+.cmu-dialog .cmu-tap-target {
+  margin: 1rem 0;
+}
+.cmu-dialog .cmu-tap-card {
+  width: 9rem;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-dialog .cmu-tap-target > label {
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+/* Ready, the select-here line and the result stack in one spot. Hidden ones
+   keep their space (visibility, not display), so the spot is always as big
+   as the select-here line; the result adds no width of its own and wraps. */
+.cmu-tap-ready,
+.cmu-tap-paused,
+.cmu-tap-result {
+  grid-area: message;
+  margin: 0;
+  font-size: 0.9rem;
+}
+.cmu-tap-ready,
+.cmu-tap-result {
+  visibility: hidden;
+  color: var(--cmu-green);
+  font-weight: 700;
+}
+.cmu-tap-result {
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+.cmu-tap-paused {
+  color: var(--cmu-muted);
+}
+/* Listening: Ready, or who the last tap found */
+.cmu-tap-target:focus-within .cmu-tap-paused {
+  visibility: hidden;
+}
+.cmu-tap-target:focus-within .cmu-tap-result:not(:empty) {
+  visibility: visible;
+}
+.cmu-tap-target:focus-within:not(:has(.cmu-tap-result:not(:empty))) .cmu-tap-ready {
+  visibility: visible;
+}
+.cmu-tap-other {
+  margin-top: 0.75em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-tap-other > label {
+  margin-top: 0.75em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-tap-other .cmu-field-button {
+  margin: 0;
+}
+/* The 0.2.7 search row (cmu-tap-search) still works; new pages use
+   cmu-field-button */
+.cmu-tap-search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.25em 0.75em;
+  margin-top: 0.5em;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-tap-search > label {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+body:is(.cmu-app, .cmu-framed) .cmu-tap-search > input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+#content .cmu-tap-search > .btn {
+  margin: 0;
+}
+
+/* Panels for framed pages: plain and left-aligned, since the host tool
+   already frames them */
+.cmu-panel {
+  max-width: 44rem;
+}
+.cmu-panel-header h2 {
+  margin: 0 0 0.5rem;
+}
+.cmu-panel-body {
+  padding: 1.5rem 0;
+}
+.cmu-panel-body table.alternate {
+  margin-bottom: 1.25rem;
+}
+.cmu-panel-body table.alternate td:first-child {
+  width: 2.5em;
+  text-align: center;
+}
+.cmu-panel-body input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+.cmu-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cmu-line);
+}
+.cmu-panel-footer .btn,
+.cmu-panel-footer button {
+  margin: 0;
+}

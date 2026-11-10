@@ -1,0 +1,1401 @@
+/* cmu-cms.css: content components for pages built on the CMU web template
+   (www.cmu.edu/common/standard-v6). For CMS sites and apps alike; apps add
+   cmu-app.css on top.
+
+   Rules: link the template's own CSS (main.6.7.min.css) and use its classes
+   as they are (a.btn, .btn.ghost, a.cta, table.alternate, .sr-only). Never
+   copy its rules or values. Add a cmu-* class only where the template has
+   nothing. */
+
+/* The hidden attribute always hides, even where a kit or template rule sets
+   display (such as a bold form label) */
+[hidden] {
+  display: none !important;
+}
+
+:root {
+  --cmu-red: #c41230;
+  --cmu-ink: #22262a;
+  --cmu-muted: #5b6670;
+  --cmu-line: #d9dde1;
+  --cmu-tint: #f4f5f6;
+  --cmu-green: #1d5a3a;
+  --cmu-green-fill: #00853e;
+  --cmu-green-tint: #e3f1ea;
+  --cmu-amber: #6b4d00;
+  --cmu-amber-tint: #fff4d6;
+  --cmu-gold: #fdb515;
+  --cmu-gray: #4a535b;
+  --cmu-gray-tint: #eceef0;
+  --cmu-red-tint: #fdf2f3;
+  --cmu-blue: #043673; /* the template's blue */
+  --cmu-link: #941120; /* the template's link color */
+  --cmu-link-hover: #f00;
+  --cmu-blue-tint: #e9eff7;
+  /* Checkboxes, radio buttons, sliders and progress bars in CMU red instead
+     of the browser's blue */
+  accent-color: var(--cmu-red);
+}
+
+/* A section heading with the template's line over it (rule-top): the
+   template zeroes the top padding of a section's first heading, which puts
+   the words right against the line; keep the room between them */
+:is(h1, h2, h3, h4).rule-top:first-child {
+  padding-top: 1em;
+}
+/* Mid-section, room above the line, so it doesn't crowd a table, code block
+   or callout just before it */
+:is(h1, h2, h3, h4).rule-top:not(:first-child) {
+  margin-top: 2rem;
+}
+/* Right after a band with a background color, the change of color already
+   marks the new section, so the next section's line is redundant */
+:is(.content, .grid):is(
+    .grey,
+    .cmu-lightgrey,
+    .darkgrey,
+    .red,
+    .gold,
+    .blue,
+    .teal,
+    .green,
+    .darkgreen
+  )
+  + :is(.content, .grid)
+  > div
+  > :is(h1, h2, h3, h4, .cmu-eyebrow).rule-top:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+/* An eyebrow can take the line instead of its heading; its small text has
+   no line height to spare, so give it room under the line */
+.cmu-eyebrow.rule-top {
+  padding-top: 0.9rem;
+}
+
+/* Small capitals: eyebrow (red, above a heading), label (gray) */
+.cmu-eyebrow {
+  margin: 0 0 0.5rem;
+  /* The template pads paragraphs; an eyebrow sits right on its heading. */
+  padding-bottom: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cmu-red);
+}
+.cmu-eyebrow + h1,
+.cmu-eyebrow + h2,
+.cmu-eyebrow + h3 {
+  margin-top: 0;
+  padding-top: 0;
+}
+.cmu-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cmu-muted);
+}
+/* A block label sits just above what it labels, whatever that is: a
+   paragraph, a list, a field or a code block. The template pads both. (A
+   span label sits beside its controls instead.) */
+:is(p, div, legend).cmu-label {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0;
+}
+:is(p, div, legend).cmu-label + * {
+  margin-top: 0;
+  padding-top: 0;
+}
+.cmu-lead {
+  font-size: 1.2rem;
+  line-height: 1.55;
+  max-width: 44em;
+  margin: 0 0 1.75rem;
+}
+/* A button with a call to action beside it: a cmu-cta-row, or any paragraph
+   that holds a button and then a call to action. (Not any div: a card's div
+   holds its heading and text too.) */
+.cmu-cta-row,
+p:has(> .btn + .cta) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+}
+.cmu-cta-row {
+  margin: 0 0 2.5rem;
+}
+.cmu-cta-row .btn,
+p:has(> .btn + .cta) > .btn {
+  margin: 0;
+}
+.cmu-cta-note {
+  margin: 0;
+  color: var(--cmu-muted);
+  font-size: 0.95rem;
+}
+
+/* Hero card: copy on the left, a screenshot in a browser frame on the right */
+.cmu-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 0 0 3.5rem;
+  padding: 3rem 2.5rem;
+  background:
+    linear-gradient(135deg, rgba(196, 18, 48, 0.06) 0%, rgba(23, 44, 75, 0.06) 100%),
+    var(--cmu-tint);
+  border-top: 6px solid var(--cmu-red);
+}
+.cmu-hero h1 {
+  font-size: clamp(2.2rem, 4.6vw, 3.3rem);
+  letter-spacing: -0.01em;
+}
+/* A heading right after a hero, in the same block, starts a new section:
+   leave what two sections' padding would (as when the hero is its own
+   section), not the hero's margin plus the template's heading padding */
+:is(#content, body) .cmu-hero:has(+ :is(h1, h2)) {
+  margin-bottom: 4rem;
+}
+:is(#content, body) .cmu-hero + :is(h1, h2) {
+  padding-top: 0;
+}
+.cmu-hero .cmu-cta-row {
+  margin-bottom: 0.9rem;
+}
+.cmu-hero .cmu-cta-row:last-child {
+  margin-bottom: 0;
+}
+.cmu-hero-art {
+  position: relative;
+  min-width: 0;
+}
+.cmu-hero-art img {
+  display: block;
+  box-sizing: border-box; /* the border fits inside the window's width */
+  border: 1px solid var(--cmu-line);
+  border-top: 0;
+  box-shadow: 0 18px 40px rgba(23, 44, 75, 0.16);
+}
+.cmu-hero-art::before,
+.cmu-shot--browser::before {
+  /* browser-window bar with three dots */
+  content: "";
+  display: block;
+  height: 1.6rem;
+  background:
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 0.7rem 50% / 0.9rem 0.9rem
+      no-repeat,
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 1.6rem 50% / 0.9rem 0.9rem
+      no-repeat,
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 2.5rem 50% / 0.9rem 0.9rem
+      no-repeat,
+    #e4e7ea;
+  border: 1px solid var(--cmu-line);
+  border-bottom: 0;
+}
+/* Two or three screenshots, overlapping down and to the right, cropped to
+   one shape from the top; the last is in front */
+.cmu-hero-art--stack {
+  display: grid;
+}
+.cmu-hero-art--stack::before {
+  display: none;
+}
+/* Each image, or a link around it (such as to enlarge it), is one window */
+.cmu-hero-art--stack > * {
+  grid-area: 1 / 1;
+  width: 66%;
+}
+:is(#content, body) .cmu-hero-art--stack > a:not(.btn):not(.cta):not(.box):not(.scrolldown) {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+.cmu-hero-art--stack > a img {
+  width: 100%;
+}
+/* Each window draws its own bar, with the dots, in its top padding */
+.cmu-hero-art--stack img {
+  box-sizing: content-box;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: left top; /* keep the roof and the start of each line */
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--cmu-line);
+  background:
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 0.7rem 0.35rem / 0.9rem 0.9rem
+      no-repeat,
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 1.6rem 0.35rem / 0.9rem 0.9rem
+      no-repeat,
+    radial-gradient(circle, #b9bfc5 0.28rem, transparent 0.3rem) 2.5rem 0.35rem / 0.9rem 0.9rem
+      no-repeat,
+    #e4e7ea;
+}
+.cmu-hero-art--stack > :nth-child(2) {
+  margin: 17% 0 0 17%;
+}
+/* The third, or the second of two, goes all the way to the right */
+.cmu-hero-art--stack > :nth-child(3),
+.cmu-hero-art--stack > :nth-child(2):last-child {
+  margin: 34% 0 0 34%;
+}
+/* A photo or a tartan pattern file, with no browser frame */
+.cmu-hero-art--plain::before {
+  display: none;
+}
+.cmu-hero-art--plain img {
+  border: 0;
+  box-shadow: none;
+  width: 100%;
+}
+@media (max-width: 820px) {
+  .cmu-hero {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.25rem;
+  }
+}
+
+/* Card links: one per audience or option */
+.cmu-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1.25rem;
+  margin: 0 0 3.5rem;
+}
+.cmu-paths--two {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  margin-bottom: 2.75rem;
+}
+a.cmu-path,
+a.cmu-path:link,
+a.cmu-path:visited {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.6rem 1.5rem 1.9rem !important; /* beats #content a { padding-bottom: 1px } */
+  background: #fff;
+  border: 1px solid var(--cmu-line) !important;
+  color: var(--cmu-ink) !important;
+  text-decoration: none !important;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+a.cmu-path strong {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+a.cmu-path .cmu-eyebrow {
+  margin: 0;
+  color: var(--cmu-muted);
+}
+a.cmu-path .cta {
+  margin-top: auto;
+}
+a.cmu-path:hover,
+a.cmu-path:focus-visible {
+  border-color: var(--cmu-red) !important;
+  box-shadow: 0 8px 22px rgba(23, 44, 75, 0.12);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  a.cmu-path {
+    transition: none;
+  }
+  a.cmu-path:hover {
+    transform: none;
+  }
+}
+
+/* How it works: numbered columns */
+ol.cmu-flow {
+  counter-reset: cmu-flow;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1.5rem;
+  margin: 0 0 3.5rem;
+  padding: 0;
+}
+ol.cmu-flow > li {
+  counter-increment: cmu-flow;
+  position: relative;
+  padding-top: 3.4rem;
+  line-height: 1.55;
+}
+ol.cmu-flow > li::before {
+  content: counter(cmu-flow);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--cmu-red);
+  border-radius: 50%;
+  color: var(--cmu-red);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+ol.cmu-flow > li > strong {
+  display: block;
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Callout: a labeled aside on a page (cmu-label, then text beside it) */
+.cmu-callout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.5rem;
+  margin: 0 0 3.5rem;
+  padding: 1.4rem 1.75rem;
+  background: var(--cmu-tint);
+  border-left: 4px solid var(--cmu-line);
+}
+.cmu-callout p {
+  margin: 0;
+  padding: 0;
+}
+/* Colors, for what kind of aside it is: blue for a note, green for a tip,
+   gold for a warning, red for a caution. The label takes the color too. */
+.cmu-callout--blue {
+  background: var(--cmu-blue-tint);
+  border-left-color: var(--cmu-blue);
+}
+.cmu-callout--green {
+  background: var(--cmu-green-tint);
+  border-left-color: var(--cmu-green-fill);
+}
+.cmu-callout--gold {
+  background: var(--cmu-amber-tint);
+  border-left-color: var(--cmu-gold);
+}
+.cmu-callout--red {
+  background: var(--cmu-red-tint);
+  border-left-color: var(--cmu-red);
+}
+.cmu-callout--blue .cmu-label {
+  color: var(--cmu-blue);
+}
+.cmu-callout--green .cmu-label {
+  color: var(--cmu-green);
+}
+.cmu-callout--gold .cmu-label {
+  color: var(--cmu-amber);
+}
+.cmu-callout--red .cmu-label {
+  color: var(--cmu-red);
+}
+
+/* Note: a plain tinted message among other content */
+.cmu-note {
+  margin: 0 0 1.25em;
+  background: var(--cmu-tint);
+  border-left: 4px solid var(--cmu-line);
+}
+/* Equal padding even on a p: the template zeroes a p's top padding when
+   it's first (p:first-child) and its bottom padding when it's last in a
+   grid (.grid p:last-child). The id in :is() only adds weight; body keeps
+   it working on pages without #content. */
+:is(#content, body) .cmu-note {
+  padding: 0.85em 1.1em;
+}
+.cmu-note p {
+  margin: 0;
+  padding: 0;
+}
+
+/* FAQ (the template's collapsed headings): the template sets the space over
+   an answer as an !important margin, which its slide animation can't touch,
+   so the space pops in before the answer slides open. As padding, it opens
+   and closes with the answer. */
+#content h2.collapsed + div {
+  margin-top: 0 !important;
+  padding-top: 1em;
+}
+
+/* FAQ teaser: a few questions and answers in columns, before a link to the FAQ */
+.cmu-faq-teaser {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0 0 1.25rem;
+}
+.cmu-faq-teaser > div {
+  padding-top: 1rem;
+  border-top: 2px solid var(--cmu-line);
+}
+.cmu-faq-teaser h3 {
+  margin: 0 0 0.35rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cmu-faq-teaser p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Two columns: text, then a screenshot; one column on phones */
+.cmu-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 2rem;
+  align-items: start;
+  margin: 0 0 2.75rem;
+}
+@media (max-width: 760px) {
+  .cmu-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Carousel: the template makes each slide (.grid) width: 100%, but on wide
+   screens it also pads .grid on both sides, so each slide came out wider
+   than the carousel and the slides drifted out of line. Count the padding
+   inside the width. */
+.js-flickityCustom .grid {
+  box-sizing: border-box;
+}
+/* The carousel script measures its height once, at load; when the page then
+   narrows (the menu opening, images arriving) the slides shrink but the
+   carousel keeps the old height, leaving a gap below. Stack the slides in
+   one grid cell instead, so the carousel is always as tall as its tallest
+   slide. The script still moves them sideways with transforms. */
+.js-flickityCustom .flickity-viewport {
+  height: auto !important; /* over the script's inline height */
+}
+.js-flickityCustom .flickity-slider {
+  position: relative;
+  display: grid;
+  height: auto;
+}
+.js-flickityCustom .flickity-slider > * {
+  grid-area: 1 / 1;
+  position: relative !important; /* over the script's inline position */
+  left: 0 !important;
+}
+
+/* Annotated image: a tall image, such as a screenshot or a diagram, on the
+   right, with numbered callouts on the left, each pinned beside its part of
+   the image (--cmu-at on the callout: how far down, 0 to 1) and overlapping
+   its edge. Where the component is narrower than 50rem (70rem with --wide),
+   the text, the callouts and the image stack. See Annotated Image in the
+   docs (sections.html). */
+.cmu-annotated {
+  --cmu-annotated-bar: 0px;
+  container-type: inline-size;
+  position: relative;
+  margin: 0 0 1.5rem;
+  padding-bottom: 2.25rem; /* room for the caption, which hangs below */
+}
+.cmu-annotated:has(> .cmu-shot--browser) {
+  --cmu-annotated-bar: 1.6rem; /* the browser window's bar, above the image */
+}
+.cmu-annotated-notes {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+.cmu-annotated-notes > li.cmu-callout {
+  margin: 0 0 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 6px 18px rgba(23, 44, 75, 0.12);
+}
+/* Title, words and call to action, one above another in every callout */
+.cmu-annotated-notes > li.cmu-callout > p {
+  flex-basis: 100%;
+}
+@container (min-width: 50rem) {
+  .cmu-annotated:not(.cmu-annotated--wide) > figure {
+    position: relative;
+    width: 56%;
+    margin: 0 0 0 auto;
+  }
+  /* The caption hangs below the screenshot, so the callouts line up with
+     the image alone */
+  .cmu-annotated:not(.cmu-annotated--wide) > figure > figcaption {
+    position: absolute;
+    top: 100%;
+  }
+  .cmu-annotated:not(.cmu-annotated--wide) .cmu-annotated-text {
+    position: absolute;
+    top: 0;
+    bottom: 2.25rem; /* the image alone, not the caption\'s room */
+    left: 0;
+    width: 46%;
+    z-index: 1;
+  }
+  /* Text above the callouts stays clear of the screenshot */
+  .cmu-annotated:not(.cmu-annotated--wide) .cmu-annotated-text > p {
+    margin-right: 13%;
+  }
+  .cmu-annotated:not(.cmu-annotated--wide) .cmu-annotated-notes {
+    margin: 0;
+  }
+  .cmu-annotated:not(.cmu-annotated--wide) .cmu-annotated-notes > li.cmu-callout {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--cmu-annotated-bar) + (100% - var(--cmu-annotated-bar)) * var(--cmu-at, 0));
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+/* --wide, for long text or callouts: side by side only from 70rem */
+@container (min-width: 70rem) {
+  .cmu-annotated--wide > figure {
+    position: relative;
+    width: 56%;
+    margin: 0 0 0 auto;
+  }
+  /* The caption hangs below the screenshot, so the callouts line up with
+     the image alone */
+  .cmu-annotated--wide > figure > figcaption {
+    position: absolute;
+    top: 100%;
+  }
+  .cmu-annotated--wide .cmu-annotated-text {
+    position: absolute;
+    top: 0;
+    bottom: 2.25rem; /* the image alone, not the caption\'s room */
+    left: 0;
+    width: 46%;
+    z-index: 1;
+  }
+  /* Text above the callouts stays clear of the screenshot */
+  .cmu-annotated--wide .cmu-annotated-text > p {
+    margin-right: 13%;
+  }
+  .cmu-annotated--wide .cmu-annotated-notes {
+    margin: 0;
+  }
+  .cmu-annotated--wide .cmu-annotated-notes > li.cmu-callout {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--cmu-annotated-bar) + (100% - var(--cmu-annotated-bar)) * var(--cmu-at, 0));
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+
+/* A screenshot with a border and an optional caption. --browser draws it in
+   a browser window; its bar is shared with the hero's, above */
+.cmu-shot {
+  margin: 0 0 1.75rem;
+}
+.cmu-shot img {
+  display: block;
+  box-sizing: border-box;
+  border: 1px solid var(--cmu-line);
+  box-shadow: 0 6px 18px rgba(23, 44, 75, 0.1);
+}
+/* The window is as wide as its screenshot, never wider than the column */
+.cmu-shot--browser {
+  width: fit-content;
+  max-width: 100%;
+}
+.cmu-shot--browser img {
+  border-top: 0;
+}
+/* A linked screenshot: the link wraps the image exactly, with no underline.
+   The template pads and underlines every link in #content with
+   #content a:not(.btn):not(.cta):not(.box):not(.scrolldown), so this
+   matches its weight. */
+:is(#content, body) .cmu-shot a:not(.btn):not(.cta):not(.box):not(.scrolldown) {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+/* Captioned like the template's own photos (figure.image) */
+.cmu-shot figcaption {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Enlarge on click (uses cmu-app.js): a link to the full-size image with
+   data-cmu-zoom opens it over the page, dimmed behind, in a <dialog>; see
+   Enlarge on Click in the docs (content.html) */
+a[data-cmu-zoom] {
+  cursor: zoom-in;
+}
+/* The link hugs its image, without the template's link underline and
+   padding, so a focus ring (as when the enlarged image closes and focus
+   comes back) goes around the picture, not a strip across it */
+:is(#content, body) a[data-cmu-zoom],
+:is(#content, body) a[data-cmu-zoom]:hover {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  vertical-align: top;
+}
+:is(#content, body) a[data-cmu-zoom] img {
+  display: block;
+}
+/* The template marks a focused or pressed link with a red background and
+   an important 3px outline. On a zoom link: no box while it's pressed (the
+   click opens the image), and the ring covers a screenshot's 1px border
+   instead of leaving it as a light gap inside the ring */
+:is(#content, body) a[data-cmu-zoom]:active:not(:focus-visible) {
+  outline: none !important;
+  background: none !important;
+}
+:is(#content, body) .cmu-shot > a[data-cmu-zoom]:focus-visible {
+  outline-offset: -1px;
+}
+/* In a browser-window screenshot, the ring goes around the whole window: the
+   link's overlay reaches up over the bar, the figure's ::before (1.6rem plus
+   its 1px top border) */
+:is(#content, body) .cmu-shot--browser > a[data-cmu-zoom] {
+  position: relative;
+  overflow: visible !important;
+}
+:is(#content, body) .cmu-shot--browser > a[data-cmu-zoom]:focus-visible {
+  outline: none !important;
+}
+:is(#content, body) .cmu-shot--browser > a[data-cmu-zoom]:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1.6rem - 1px) 0 0;
+  outline: 3px solid var(--cmu-red);
+  outline-offset: -1px;
+  pointer-events: none;
+}
+.cmu-zoom {
+  max-width: min(92vw, 1400px);
+  max-height: 92vh;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+}
+.cmu-zoom::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+.cmu-zoom-frame {
+  max-height: 92vh;
+  overflow: auto;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+.cmu-zoom img {
+  display: block;
+  max-width: 100%;
+  max-height: 92vh;
+  cursor: zoom-out;
+}
+/* An image much taller than the window: full width, scrolling (the script
+   decides) */
+.cmu-zoom--tall img {
+  max-height: none;
+}
+/* The template darkens every button on hover; this one stays a plain white x */
+.cmu-zoom .cmu-zoom-close,
+.cmu-zoom .cmu-zoom-close:hover {
+  position: absolute;
+  top: -2.75rem;
+  right: 0;
+  margin: 0;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: #fff;
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+/* Scroll gallery (uses cmu-app.js): steps of text, each with a figure. On a
+   wide screen the text scrolls on the left and a sticky stage on the right
+   shows the current step's figure, fading up to the next as it arrives, or
+   with --slide, sliding in from the side; on a narrow one, or without the
+   script, each step shows its own figure. See
+   Scroll Gallery in the docs (sections.html) */
+.cmu-scroll-gallery-step + .cmu-scroll-gallery-step {
+  margin-top: 2.5rem;
+}
+.cmu-scroll-gallery-step > figure {
+  margin-top: 1.25rem;
+}
+.cmu-scroll-gallery-stage {
+  display: none;
+}
+@media (min-width: 768px) {
+  .cmu-scroll-gallery--on {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    column-gap: 3rem;
+  }
+  .cmu-scroll-gallery--on > .cmu-scroll-gallery-step {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 70vh;
+    margin: 0;
+  }
+  .cmu-scroll-gallery--on > .cmu-scroll-gallery-step > figure {
+    display: none;
+  }
+  .cmu-scroll-gallery--on > .cmu-scroll-gallery-stage {
+    grid-column: 2;
+    position: sticky;
+    top: 15vh;
+    align-self: start;
+    display: grid;
+  }
+  .cmu-scroll-gallery-stage > figure {
+    grid-area: 1 / 1;
+    margin: 0;
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+  }
+  .cmu-scroll-gallery-stage > .cmu-scroll-gallery-past {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+  }
+  .cmu-scroll-gallery-stage > .cmu-scroll-gallery-next {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  /* --slide: in from the side. The stage clips the pictures waiting either
+     side, with room for the screenshot's shadow */
+  .cmu-scroll-gallery--slide > .cmu-scroll-gallery-stage {
+    overflow: hidden;
+    padding: 0.5rem 1.25rem 1.75rem;
+    margin: -0.5rem -1.25rem -1.75rem;
+  }
+  .cmu-scroll-gallery--slide .cmu-scroll-gallery-stage > figure {
+    transition: transform 0.6s ease;
+  }
+  .cmu-scroll-gallery--slide .cmu-scroll-gallery-stage > .cmu-scroll-gallery-past {
+    opacity: 1;
+    transform: translateX(calc(-100% - 3rem));
+  }
+  .cmu-scroll-gallery--slide .cmu-scroll-gallery-stage > .cmu-scroll-gallery-next {
+    opacity: 1;
+    transform: translateX(calc(100% + 3rem));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmu-scroll-gallery-stage > figure,
+  .cmu-scroll-gallery--slide .cmu-scroll-gallery-stage > figure {
+    transition: none;
+  }
+  .cmu-scroll-gallery--slide .cmu-scroll-gallery-stage > :not(.cmu-scroll-gallery-current) {
+    opacity: 0;
+  }
+}
+
+/* A line across a grid band's full width, above or below its cards, such as
+   an introduction or a link to see more (the template spans only a first h1) */
+.grid > .cmu-grid-full {
+  flex: 0 0 100%;
+}
+
+/* A kit block that ends its content section (as each does in Cascade, one
+   block per section) leaves the space below to the section's own padding */
+#content .content > div > [class^="cmu-"]:last-child,
+#content .content > div > [class*=" cmu-"]:last-child {
+  margin-bottom: 0;
+}
+
+/* Table cells centered vertically, so one-line cells sit level with wrapped
+   ones and with images (the template sets top or baseline) */
+#content table.alternate td {
+  vertical-align: middle;
+}
+/* In a gray or gold section, a striped table keeps its white rows: the
+   template leaves them clear, so they'd take on the section's color */
+#content :is(.grey, .cmu-lightgrey, .gold) table.alternate {
+  background-color: #fff;
+}
+
+/* A light gray section, the gray of the kit's code snippets: lighter than
+   the template's grey, for a testimonial or a quiet band. Text stays dark. */
+.cmu-lightgrey {
+  background-color: var(--cmu-tint);
+}
+
+/* Testimonial: a quote from a person, with their name, role and square
+   photo beside it. Put it in a section such as content wide cmu-lightgrey.
+   Stacks on phones, photo first. See Testimonial in the docs
+   (sections.html). */
+.cmu-testimonial {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+}
+.cmu-testimonial > img {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.cmu-testimonial > figure {
+  margin: 0;
+}
+/* The red quotation-mark tile; decoration, so screen readers skip it */
+.cmu-testimonial > figure::before {
+  content: "\201C" / "";
+  display: block;
+  width: 4.5rem;
+  height: 4.5rem;
+  background: var(--cmu-red);
+  color: #fff;
+  font:
+    700 5rem/1.15 Georgia,
+    "Times New Roman",
+    serif;
+  text-align: center;
+  overflow: hidden;
+}
+/* The template's blockquote is 2.35em and light; here the quote is set at
+   about lead size, semibold, with a thin rule beside it at 30% black (the
+   template's 15% fades on gray) */
+#content .cmu-testimonial blockquote {
+  margin: 1.75rem 0 0;
+  padding: 0 0 0 2rem;
+  border-left: 1px solid rgba(0, 0, 0, 0.3);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--cmu-ink);
+}
+#content .cmu-testimonial blockquote p {
+  margin: 0;
+  padding: 0;
+}
+.cmu-testimonial cite {
+  display: block;
+  margin-top: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.cmu-testimonial cite strong {
+  color: var(--cmu-red);
+  font-size: 1.25rem;
+}
+@media (max-width: 760px) {
+  .cmu-testimonial {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  .cmu-testimonial > img {
+    grid-column: 1;
+    max-width: 16rem;
+  }
+  .cmu-testimonial > figure {
+    grid-row: 2;
+  }
+  #content .cmu-testimonial blockquote {
+    font-size: 1.3rem;
+  }
+}
+
+/* A page from another site in a frame (a dashboard, a form): the width of
+   its column at any screen size; set its height with the height attribute.
+   The template sizes only video iframes. */
+.cmu-embed {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--cmu-line);
+}
+
+/* A block of code to read or copy: scrolls sideways by default; --wrap
+   wraps long lines (URLs, HTML) so all of it stays in view. It belongs to
+   the sentence that introduces it, so it sits close under it (like a line
+   break), then a paragraph's space before what follows. */
+p:not(.cmu-label):has(+ :is(.cmu-snippet, .cmu-copyable)) {
+  padding-bottom: 0.5em;
+}
+.cmu-snippet {
+  margin: 0 0 1em;
+  overflow-x: auto;
+  background: var(--cmu-tint);
+  border: 1px solid var(--cmu-line);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  /* Long lines wrap rather than scroll; copying still gives them as written */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* Keep the inset when the template zeroes a pre's first/last-child padding. */
+:is(#content, body) .cmu-snippet {
+  padding: 1rem 1.25rem;
+}
+.cmu-snippet code {
+  font-family: Menlo, Consolas, monospace;
+}
+/* On a dark band (invert), the template turns text white; the snippet keeps
+   its light box, so its code (and anything marked up inside it) stays dark */
+.invert .cmu-snippet,
+.invert .cmu-snippet * {
+  color: var(--cmu-ink);
+}
+/* Wrapping is the default now; the old name still works */
+.cmu-snippet--wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* A named copy button beside its block, on the right; under it on phones */
+.cmu-copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin: 0 0 1em;
+}
+.cmu-copy-row > .cmu-snippet {
+  flex: 1 1 18rem;
+  min-width: 0;
+  margin: 0;
+}
+.cmu-copy-row > .btn {
+  margin: 0;
+}
+/* In a copy box, room on the right so the text never runs under the icon */
+.cmu-copyable > .cmu-snippet {
+  padding-right: 3rem;
+}
+
+/* A code block with a copy icon in its top right corner, where people look
+   for it. The wrapper holds the button still while the code scrolls
+   sideways under it.
+   Uses cmu-app.js. Icons: Bootstrap Icons copy and check-lg, MIT license,
+   Copyright (c) 2019-2024 The Bootstrap Authors. */
+.cmu-copyable {
+  position: relative;
+  margin: 0 0 1em;
+}
+/* The template zeroes a first and last child's padding; keep the block's */
+:is(#content, body) .cmu-copyable > .cmu-snippet {
+  margin: 0;
+  padding: 1rem 3.25rem 1rem 1.25rem;
+}
+.cmu-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid var(--cmu-line);
+  border-radius: 6px;
+  color: #6d6e71;
+  cursor: pointer;
+}
+/* The template darkens every button on hover (and a tap leaves it there) */
+.cmu-copy:hover {
+  background: #fff;
+  color: #222;
+  border-color: #6d6e71;
+}
+.cmu-copy::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.cmu-copy[data-cmu-copy-state="copied"] {
+  color: var(--cmu-green);
+  border-color: currentColor;
+}
+.cmu-copy[data-cmu-copy-state="copied"]::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z'/%3E%3C/svg%3E");
+}
+/* Countdown (uses cmu-app.js): days, hours, minutes and seconds on flip
+   cards; see Countdown in the docs (content.html). The sentence inside is
+   the fallback and what screen readers get; the script hides it visually. */
+.cmu-countdown-on > :not(.cmu-countdown-clock, .cmu-countdown-done) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* --replace: once it's done, the done message takes the cards' place */
+.cmu-countdown--replace.cmu-countdown-ended > .cmu-countdown-clock {
+  display: none;
+}
+.cmu-countdown-clock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0 2rem;
+  perspective: 400px;
+}
+.cmu-countdown-clock *,
+.cmu-countdown-clock *::before,
+.cmu-countdown-clock *::after {
+  box-sizing: border-box;
+}
+.cmu-countdown-unit {
+  text-align: center;
+}
+.cmu-countdown-label {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.1rem;
+  color: var(--cmu-muted);
+}
+.cmu-countdown-card {
+  display: block;
+  position: relative;
+  padding-bottom: 0.72em;
+  font-size: 3.25rem;
+  line-height: 1.25;
+}
+@media (max-width: 767px) {
+  .cmu-countdown-card {
+    font-size: 2.25rem;
+  }
+}
+.cmu-countdown-top,
+.cmu-countdown-bottom,
+.cmu-countdown-back::before,
+.cmu-countdown-back::after {
+  display: block;
+  /* Whole-pixel widths: each half is drawn on its own layer, and halves of a
+     fractional width can land a pixel apart */
+  width: fit-content;
+  width: calc-size(fit-content, round(up, size, 1px));
+  min-width: 1.8em;
+  min-width: round(up, 1.8em, 1px);
+  height: 0.72em;
+  padding: 0 0.25em;
+  border-radius: 0.15em 0.15em 0 0;
+  background: #222;
+  color: #ccc;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transform-style: preserve-3d;
+}
+.cmu-countdown-bottom {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  overflow: hidden;
+  border-top: 1px solid #000;
+  border-radius: 0 0 0.15em 0.15em;
+  background: #393939;
+  color: #fff;
+  pointer-events: none;
+}
+.cmu-countdown-bottom::after {
+  content: attr(data-value);
+  display: block;
+  margin-top: -0.72em;
+}
+.cmu-countdown-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  pointer-events: none;
+}
+.cmu-countdown-back::before {
+  content: attr(data-value);
+  position: relative;
+  z-index: -1;
+  overflow: hidden;
+}
+.cmu-countdown-flip .cmu-countdown-back::before {
+  animation: cmu-countdown-top 0.3s cubic-bezier(0.37, 0.01, 0.94, 0.35) both;
+  transform-origin: center bottom;
+}
+.cmu-countdown-flip .cmu-countdown-back .cmu-countdown-bottom {
+  animation: cmu-countdown-bottom 0.6s cubic-bezier(0.15, 0.45, 0.28, 1) both;
+  transform-origin: center top;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmu-countdown-flip .cmu-countdown-back::before,
+  .cmu-countdown-flip .cmu-countdown-back .cmu-countdown-bottom {
+    animation: none;
+  }
+}
+@keyframes cmu-countdown-top {
+  0% {
+    transform: rotateX(0deg);
+    z-index: 2;
+  }
+  0%,
+  99% {
+    opacity: 0.99;
+  }
+  100% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+}
+@keyframes cmu-countdown-bottom {
+  0%,
+  50% {
+    z-index: -1;
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  51% {
+    opacity: 0.99;
+  }
+  100% {
+    opacity: 0.99;
+    transform: rotateX(0deg);
+    z-index: 5;
+  }
+}
+
+/* A Bootstrap Icon (an optional extra; see Install) floated in a card, as
+   timeline cards float an icon image: the size of one, in CMU red */
+.grid.boxes .bi.floatright {
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--cmu-red);
+}
+
+/* A heading right after a floated icon in a card sits beside it, level
+   with its top, as if it came first (the template has every heading clear
+   floats, and pads all but a first heading) */
+.grid.boxes .floatright + h2 {
+  clear: none;
+  padding-top: 0;
+}
+/* A card with a rule (timeline cards): the rule and what follows it sit at
+   the bottom, so the dates line up across a row of cards */
+.grid.boxes > div:has(> hr) {
+  display: flex;
+  flex-direction: column;
+}
+.grid.boxes > div:has(> hr) > hr {
+  margin-top: auto;
+}
+/* Space above the rule when nothing stretches the card (stacked on phones) */
+.grid.boxes > div:has(> hr) > :first-child {
+  margin-bottom: 1rem;
+}
+
+/* Cards with the words at the bottom (cmu-cards-bottom): each card's
+   heading, words and link sit at its bottom, so they line up across a row
+   whose pictures differ in height; the picture is centered in the space
+   above. Without a picture, the words still sit at the bottom */
+.grid.boxes.cmu-cards-bottom > div {
+  display: flex;
+  flex-direction: column;
+}
+.grid.boxes.cmu-cards-bottom > div > :is(img, figure):first-child {
+  float: none;
+  align-self: center;
+  max-width: 100%;
+  height: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.grid.boxes.cmu-cards-bottom > div > :is(img, figure):first-child + * {
+  margin-top: 1.5rem;
+}
+.grid.boxes.cmu-cards-bottom > div:not(:has(> :is(img, figure):first-child)) > :first-child {
+  margin-top: auto;
+}
+
+/* Lists: check marks, numbered steps */
+/* Plain list: no bullets, for a list whose items each start with their own
+   label, such as a pill or a bold term. Items keep the template's indent. */
+ul.cmu-plain {
+  list-style: none;
+}
+/* Replace the template's list indent, including its extra indent from the
+   tenth ordered item onward. Nested ordinary lists keep their own indent. */
+:is(#content, body) :is(.cmu-flow, .cmu-steps, .cmu-checks) > li {
+  margin-left: 0;
+}
+.cmu-checks {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+.cmu-checks > li {
+  position: relative;
+  padding: 0 0 0.7rem 1.7rem;
+  line-height: 1.5;
+}
+.cmu-checks > li::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.15em;
+  width: 0.5rem;
+  height: 0.85rem;
+  border: solid var(--cmu-red);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+ol.cmu-steps {
+  counter-reset: cmu-step;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+ol.cmu-steps > li {
+  counter-increment: cmu-step;
+  position: relative;
+  padding: 0 0 1rem 2.4rem;
+  line-height: 1.55;
+  min-height: 1.6rem;
+}
+ol.cmu-steps > li::before {
+  content: counter(cmu-step);
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  box-sizing: border-box;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--cmu-red);
+  border-radius: 50%;
+  color: var(--cmu-red);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Tables. The template makes tables display: block so they scroll on
+   phones, which won't stretch them; cmu-full stretches them from 768px.
+   position: relative keeps screen-reader-only text (.sr-only, positioned
+   absolutely) inside that scroll, so it can't widen the page. */
+table {
+  position: relative;
+}
+table.cmu-full {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  table.cmu-full {
+    display: table;
+  }
+}
+table.cmu-compare {
+  table-layout: fixed;
+}
+.cmu-compare th,
+.cmu-compare td {
+  width: 50%;
+}
+
+/* Pills: gray unless given a tone */
+.cmu-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border-radius: 3px;
+  background: var(--cmu-gray-tint);
+  color: var(--cmu-gray);
+}
+.cmu-pill--green {
+  background: var(--cmu-green-tint);
+  color: var(--cmu-green);
+}
+.cmu-pill--amber {
+  background: var(--cmu-amber-tint);
+  color: var(--cmu-amber);
+}
+
+/* Dates: a month-and-day block in the style of the events.cmu.edu (LiveWhale)
+   widgets, for a date on its own or over a photo. A list of dates is the
+   template's .events. Markup: <time class="cmu-date" datetime="2026-10-28">
+   <span class="cmu-date-month">Oct</span> <span class="cmu-date-day">28</span></time> */
+.cmu-date {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 0 auto;
+  min-width: 3.25em;
+  border: 1px solid var(--cmu-gray);
+  background: #fff;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+  text-align: center;
+}
+.cmu-date-month {
+  background: var(--cmu-gray);
+  color: #fff;
+  padding: 0 0.5em;
+  letter-spacing: 0.05em;
+}
+.cmu-date-day {
+  color: var(--cmu-ink);
+  font-size: 1.25em;
+  padding: 0 0.4em;
+}
+.cmu-date--red {
+  border-color: var(--cmu-red);
+}
+.cmu-date--red .cmu-date-month {
+  background: var(--cmu-red);
+}
+/* Event cards: a photo with the date over its corner and a red rule under it */
+#content .cmu-event-cards,
+.cmu-event-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0 0 1.5em;
+  padding: 0;
+}
+#content .cmu-event-cards > li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.cmu-event-cards img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-bottom: 4px solid var(--cmu-red);
+  margin: 0 0 0.5em;
+}
+.cmu-event-cards .cmu-date {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+.cmu-event-cards h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.05em;
+  font-weight: 700;
+}
+.cmu-event-cards p {
+  margin: 0.25em 0 0;
+  padding: 0;
+  color: var(--cmu-muted);
+  font-size: 0.9em;
+}
