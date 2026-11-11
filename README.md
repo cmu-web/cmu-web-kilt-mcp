@@ -1,70 +1,60 @@
 # Carnegie Mellon Web Kilt MCP Server
 
-An [MCP](https://modelcontextprotocol.io/) server for the
-[Carnegie Mellon Web Kilt](https://webkilt.andrew.cmu.edu/), so an AI coding
-agent can set up the kit and build pages with it the way the docs describe.
+**Give Your Agent the Kit's Own Docs**
 
-It reads each kit release's own data (`docs/kit.json` and the stylesheets)
-from jsDelivr, so it knows every release from 0.3.0 on and never falls
-behind the docs. It only reads public docs: no sign-in, nothing stored.
+An MCP server that helps coding agents build with the
+[Carnegie Mellon Web Kilt](https://webkilt.andrew.cmu.edu/).
+It supplies installation steps, component markup, framework notes and
+writing conventions from the kit's releases, plus a check for common markup
+mistakes.
 
-## Add It to Your Agent
+**[Explore the Web Kilt](https://webkilt.andrew.cmu.edu/)** ·
+[Connect Your Agent](#connect-your-agent) ·
+[Work on the Server](DEVELOPMENT.md)
 
-The hosted server is at `https://webkilt.andrew.cmu.edu/mcp` (Streamable
-HTTP).
+## Connect Your Agent
 
-Claude Code:
+Add a remote MCP server in your agent's settings:
 
-```bash
-claude mcp add --transport http cmu-web-kilt https://webkilt.andrew.cmu.edu/mcp
-```
+| Setting        | Value                                |
+| -------------- | ------------------------------------ |
+| Name           | `cmu-web-kilt`                       |
+| Transport      | Streamable HTTP                      |
+| URL            | `https://webkilt.andrew.cmu.edu/mcp` |
+| Authentication | None                                 |
 
-VS Code (`.vscode/mcp.json`):
+Then ask it to set up the Web Kilt for your project. The server provides a
+`set-up-kit` prompt for clients that support MCP prompts.
 
-```json
-{
-  "servers": {
-    "cmu-web-kilt": { "type": "http", "url": "https://webkilt.andrew.cmu.edu/mcp" }
-  }
-}
-```
+For a server your agent starts locally over stdio, see
+[Run It With an Agent](DEVELOPMENT.md#run-it-with-an-agent).
 
-Cursor and most other agents take the same address in their MCP settings.
+## Start With What You're Building
 
-To run it on your own computer instead, over stdio:
+- **Set up a project:** `get_install` supplies the release's installation
+  steps for your kind of site or app.
+- **Build a page:** `search_components` and `get_component` find the
+  components and return their markup, with optional framework guidance.
+- **Review the result:** `get_conventions` supplies the writing and page
+  conventions; `check_html` checks kit classes, hooks and page dependencies.
 
-```bash
-npx -y cmu-web-kilt-mcp
-```
+Each tool accepts a kit `version`. Use the version your project loads;
+omitting it selects the latest release. Releases from 0.3.0 onward are
+supported. The MCP server's own version is separate from the kit version.
 
-## Tools
+The tools read public release data and check submitted HTML; they do not
+edit your project. Your coding agent makes the changes. The markup check
+supplements browser review and is not an accessibility audit.
 
-| Tool                | What It Does                                                                                                                                                                        |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search_components` | Lists components that match a search, or all of them, with labels and docs links                                                                                                    |
-| `get_component`     | One component's description, requirements, classes and example markup; with `framework` (React, Svelte, Vue, Rails or Django), also how to use it there, with React's markup as JSX |
-| `get_install`       | The code to add the kit for a setup: Cascade, another CMS, a web app, Django, Node, React, Svelte, Vue, Rails or a prototype (each release's own list)                              |
-| `get_conventions`   | Class names, AP style and Title Case, headings, buttons and links, messages, colors, images and accessibility                                                                       |
-| `check_html`        | Checks a page or fragment: unknown `cmu-` classes or `data-cmu-` hooks and, for a whole page, missing files, the `cmu-app` body class and the loading order                         |
+## Help Improve the Server
 
-Each tool takes an optional `version`, such as `0.4.0`; it defaults to the
-latest release. The server also has a `set-up-kit` prompt.
-
-## Develop
-
-```bash
-npm install
-npm run dev          # Streamable HTTP on http://localhost:3000/mcp
-npm run check        # lint, format, types, tests, build
-node dist/cli.js     # stdio, after npm run build
-node dist/cli.js --http 3333
-```
-
-The tests answer from a copy of kit 0.4.0's files in `test/fixtures/`, so
-they don't use the network.
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for hosting.
+[Report a problem or suggest a feature](https://github.com/cmu-web/cmu-web-kilt-mcp/issues).
+Include the tool, arguments, kit version and unexpected result.
+[Development](DEVELOPMENT.md) covers local setup, tests and the data flow;
+[Deployment](DEPLOYMENT.md) covers hosting and releases.
 
 ## License
 
-BSD 3-Clause; see [LICENSE](LICENSE).
+Copyright Carnegie Mellon University. The server code uses the
+[BSD 3-Clause License](LICENSE). That license does not grant rights to
+CMU's names, marks, artwork or web template.
