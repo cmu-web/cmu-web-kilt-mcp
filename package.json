@@ -1,6 +1,6 @@
 {
   "name": "cmu-web-kilt-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for the Carnegie Mellon Web Kilt: components, install steps, conventions and a markup check",
   "keywords": [
     "mcp",
