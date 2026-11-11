@@ -15,8 +15,10 @@ export function fakeCdn(latest = "0.4.0"): { fetch: Fetcher; calls: string[] } {
     calls.push(url);
     if (url.includes("/resolved")) return JSON.stringify({ version: latest });
     const m = /cmu-web-kilt@([\d.]+)\/(.+)$/.exec(url);
-    if (!m || m[1] !== "0.4.0") throw new Error(`404 ${url}`);
-    return read(m[2].split("/").pop()!);
+    if (!m || !["0.4.0", "0.5.0"].includes(m[1])) throw new Error(`404 ${url}`);
+    const file = m[2].split("/").pop()!;
+    // 0.5.0's files: the release with framework notes and setups
+    return read(m[1] === "0.5.0" ? file.replace(/\.(\w+)$/, "-0.5.0.$1") : file);
   };
   return { fetch, calls };
 }

@@ -5,27 +5,41 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
 import { checkHtml } from "./check";
+import { toJsx } from "./jsx";
 import { KitError, KitSource, type Component, type Kit } from "./kit";
 
 const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf8")) as {
   version: string;
 };
 
-const SETUPS = ["cascade", "other-cms", "apps", "django", "node", "prototype"] as const;
-const SETUP_NAMES: Record<(typeof SETUPS)[number], string> = {
+// What each setup in a release's kit.json is, for the ones known today; a
+// newer release can add more, which work under their own names
+const SETUP_NAMES: Record<string, string> = {
   cascade: "a Cascade site",
   "other-cms": "Drupal or another CMS on CMU's template",
   apps: "a web app (any stack)",
   django: "a Django app",
   node: "a Node app",
+  react: "a React app",
+  svelte: "a SvelteKit app",
+  vue: "a Vue app",
+  rails: "a Rails app",
   prototype: "a prototype or mockup, linked from the CDN",
+};
+// Frameworks, for releases whose kit.json doesn't list them
+const FRAMEWORKS: Record<string, string> = {
+  React: "React 18 and 19",
+  Svelte: "Svelte 5",
+  Vue: "Vue 3",
+  Rails: "Rails 7.2 and Later",
+  Django: "Django 5.2 and Later",
 };
 
 const INSTRUCTIONS = `The Carnegie Mellon Web Kilt adds components and app conventions to CMU's web template (www.cmu.edu/common/standard-v6). Docs: https://webkilt.andrew.cmu.edu/.
 
 Use it like this:
 - Set up: get_install for the project's setup. Load CMU's template first, then the kit (cmu-cms.css, then cmu-app.css for apps), then the project's own styles. Pin one exact kit version; production apps keep a local copy.
-- Build pages: search_components, then get_component for its markup. Use the template's and the kit's classes instead of writing new CSS for what they already have. Components labeled App use cmu-app on <body>; Script ones use cmu-app.js at the end of <body>.
+- Build pages: search_components, then get_component for its markup (give it the framework, React, Svelte, Vue, Rails or Django, for that framework's form). Use the template's and the kit's classes instead of writing new CSS for what they already have. Components labeled App use cmu-app on <body>; Script ones use cmu-app.js at the end of <body>.
 - Write text: get_conventions (AP style, Title Case for headings and buttons, links go somewhere and buttons do something).
 - Before finishing: check_html on the pages you changed.
 
@@ -102,6 +116,43 @@ function matches(c: Component, words: string[]): number {
   return score;
 }
 
+// What the docs' Framework tab says when nobody wrote anything for this
+// component, from its labels
+function frameworkText(name: string, c: Component): string {
+  const rails = name === "Rails";
+  let text = rails
+    ? "Nothing more to do in Rails: use this markup in a view."
+    : name === "Django"
+      ? "Nothing more to do in Django: use this markup in a template."
+      : `Nothing more to do in ${name}: use this markup in a component.`;
+  if (c.labels.includes("App")) text += " The page's <body> has the cmu-app class.";
+  if (c.labels.includes("Script"))
+    text += rails
+      ? " cmu-app.js starts it, Turbo visits included."
+      : " cmu-app.js starts it whenever it appears.";
+  if (c.labels.includes("Icons")) text += " Bootstrap Icons' stylesheet is on the page.";
+  return text;
+}
+
+const LANGS: Record<string, string> = { React: "jsx", Svelte: "svelte", Vue: "vue", Rails: "erb" };
+
+/** A component in a framework, as the docs' Framework tab has it */
+export function describeFramework(kit: Kit, c: Component, name: string): string {
+  const known = kit.frameworks ?? FRAMEWORKS;
+  const note = c.frameworks?.[name];
+  const lines = [
+    "",
+    `## In ${known[name] ?? name}`,
+    "",
+    note ? plain(note.text) : frameworkText(name, c),
+  ];
+  const code = note?.code
+    ? [note.code]
+    : c.examples.map((ex) => (name === "React" ? toJsx(ex) : ex));
+  for (const ex of code) lines.push("", "```" + (LANGS[name] ?? "html"), ex, "```");
+  return lines.join("\n");
+}
+
 export function describeComponent(kit: Kit, c: Component): string {
   const lines = [
     `# ${c.name}`,
@@ -176,19 +227,33 @@ export function createServer(source: KitSource): McpServer {
     {
       title: "Get a Component",
       description:
-        "One component's full description, what it requires (its labels), its classes and example markup to copy.",
+        "One component's full description, what it requires (its labels), its classes and example markup to copy. With a framework, also how to use it there, with the markup in that framework's form (JSX for React).",
       inputSchema: {
         id: z
           .string()
-          .describe('The component\'s id or name, from search_components, like "drop".'),
+          .describe('The component\'s id or name, from search_components, like "file-picker".'),
+        framework: z
+          .string()
+          .optional()
+          .describe("React, Svelte, Vue, Rails or Django: the project's framework."),
         version,
       },
       annotations: READ_ONLY,
     },
-    async ({ id, version: v }) => {
+    async ({ id, framework, version: v }) => {
       try {
         const kit = await source.get(v);
         const c = find(kit, id);
+        if (c && framework) {
+          const known = Object.keys(kit.frameworks ?? FRAMEWORKS);
+          const name = known.find((f) => f.toLowerCase() === framework.trim().toLowerCase());
+          if (!name)
+            return {
+              ...text(`Kit ${kit.version} covers ${known.join(", ")}, not "${framework}".`),
+              isError: true,
+            };
+          return text(describeComponent(kit, c) + "\n" + describeFramework(kit, c, name));
+        }
         if (c) return text(describeComponent(kit, c));
         const words = id
           .toLowerCase()
@@ -219,10 +284,10 @@ export function createServer(source: KitSource): McpServer {
       description:
         "The code to add the kit to a project, for one kind of setup, with the files and their loading order.",
       inputSchema: {
-        setup: z.enum(SETUPS).describe(
+        setup: z.string().describe(
           Object.entries(SETUP_NAMES)
             .map(([k, d]) => `${k}: ${d}`)
-            .join("; "),
+            .join("; ") + ". A newer kit release can have more.",
         ),
         version,
       },
@@ -231,11 +296,19 @@ export function createServer(source: KitSource): McpServer {
     async ({ setup, version: v }) => {
       try {
         const kit = await source.get(v);
-        const snippets = kit.install[setup] ?? [];
+        const key = setup.trim().toLowerCase();
+        const snippets = kit.install[key];
+        if (!snippets)
+          return {
+            ...text(
+              `Kit ${kit.version} has no "${setup}" setup. It has: ${Object.keys(kit.install).join(", ")}.`,
+            ),
+            isError: true,
+          };
         const files = Object.entries(kit.files).map(([f, url]) => `- ${f}: ${url}`);
         return text(
           [
-            `# Kit ${kit.version} in ${SETUP_NAMES[setup]}`,
+            `# Kit ${kit.version} in ${SETUP_NAMES[key] ?? key}`,
             "",
             "Load CMU's template first, then cmu-cms.css, then cmu-app.css (apps only), then the project's own styles; cmu-app.js goes at the end of <body>.",
             "",

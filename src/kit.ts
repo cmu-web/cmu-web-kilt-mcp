@@ -14,6 +14,8 @@ export interface Component {
   notes: string[];
   classes: string[];
   examples: string[];
+  /** Hand-written framework notes (0.5.0 and later), by framework */
+  frameworks?: Record<string, { text: string; code?: string }>;
 }
 
 export interface Convention {
@@ -28,6 +30,8 @@ export interface KitData {
   docs: string;
   files: Record<string, string>;
   labels: Record<string, string>;
+  /** Framework names and the versions their examples are for (0.5.0 and later) */
+  frameworks?: Record<string, string>;
   components: Component[];
   install: Record<string, string[]>;
   conventions: Convention[];

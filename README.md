@@ -39,13 +39,13 @@ npx -y cmu-web-kilt-mcp
 
 ## Tools
 
-| Tool                | What It Does                                                                                                                                                |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search_components` | Lists components that match a search, or all of them, with labels and docs links                                                                            |
-| `get_component`     | One component's description, requirements, classes and example markup                                                                                       |
-| `get_install`       | The code to add the kit for a setup: Cascade, another CMS, a web app, Django, Node or a prototype                                                           |
-| `get_conventions`   | Class names, AP style and Title Case, headings, buttons and links, messages, colors, images and accessibility                                               |
-| `check_html`        | Checks a page or fragment: unknown `cmu-` classes or `data-cmu-` hooks and, for a whole page, missing files, the `cmu-app` body class and the loading order |
+| Tool                | What It Does                                                                                                                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_components` | Lists components that match a search, or all of them, with labels and docs links                                                                                                    |
+| `get_component`     | One component's description, requirements, classes and example markup; with `framework` (React, Svelte, Vue, Rails or Django), also how to use it there, with React's markup as JSX |
+| `get_install`       | The code to add the kit for a setup: Cascade, another CMS, a web app, Django, Node, React, Svelte, Vue, Rails or a prototype (each release's own list)                              |
+| `get_conventions`   | Class names, AP style and Title Case, headings, buttons and links, messages, colors, images and accessibility                                                                       |
+| `check_html`        | Checks a page or fragment: unknown `cmu-` classes or `data-cmu-` hooks and, for a whole page, missing files, the `cmu-app` body class and the loading order                         |
 
 Each tool takes an optional `version`, such as `0.4.0`; it defaults to the
 latest release. The server also has a `set-up-kit` prompt.
