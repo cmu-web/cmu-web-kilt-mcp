@@ -141,6 +141,7 @@ npm version patch -m "chore: release %s"
 ```
 
 This updates the manifest and lockfile, creates a local commit and creates
-an annotated `v` tag. Review them, then follow
+an annotated tag named for the version, such as `0.3.0`, with no `v` prefix
+(set in `.npmrc`). Review them, then follow
 [Publish and Roll Out a Release](DEPLOYMENT.md#publish-and-roll-out-a-release).
 A kit documentation release alone doesn't require a server version bump.

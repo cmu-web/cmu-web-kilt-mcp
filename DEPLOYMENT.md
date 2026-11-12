@@ -104,16 +104,17 @@ clears process caches but does not change a release's files on the CDN.
 
 The [workflow](.github/workflows/publish.yml) checks and builds on pushes
 to `main`, pull requests, version tags and manual runs. It publishes the
-image only for `v*` tags and manual runs, after checks pass.
+image only for version tags, such as `0.3.0`, and manual runs, after checks
+pass.
 
 | Image Tag      | Meaning                                   |
 | -------------- | ----------------------------------------- |
 | `latest`       | Most recently published version-tag build |
-| `X.Y.Z`        | Build of server release tag `vX.Y.Z`      |
+| `X.Y.Z`        | Build of server release tag `X.Y.Z`       |
 | `sha-<commit>` | Build identified by its short commit hash |
 
 Complete [server release preparation](DEVELOPMENT.md#prepare-a-server-release),
-then push `main` and the specific new `v` tag together. Confirm the workflow
+then push `main` and the specific new version tag together. Confirm the workflow
 passed and record the published image digest. A manual workflow run
 publishes a commit image without moving `latest`.
 
