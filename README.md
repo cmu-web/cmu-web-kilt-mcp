@@ -39,8 +39,9 @@ For a server your agent starts locally over stdio, see
   conventions; `check_html` checks kit classes, hooks and page dependencies.
 
 Each tool accepts a kit `version`. Use the version your project loads;
-omitting it selects the latest release. Releases from 0.3.0 onward are
-supported. The MCP server's own version is separate from the kit version.
+omitting it selects the newest release of any line, which is only for a
+quick look. The major version is the CMU template line: 0.x is for the
+current template. Releases from 0.3.0 onward are supported. The MCP server's own version is separate from the kit version.
 
 The tools read public release data and check submitted HTML; they do not
 edit your project. Your coding agent makes the changes. The markup check

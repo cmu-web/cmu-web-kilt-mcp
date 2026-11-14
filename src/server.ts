@@ -6,7 +6,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
 import { checkHtml } from "./check";
 import { toJsx } from "./jsx";
-import { KitError, KitSource, type Component, type Kit } from "./kit";
+import { KitError, KitSource, lineDocs, type Component, type Kit } from "./kit";
 
 const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf8")) as {
   version: string;
@@ -35,7 +35,11 @@ const FRAMEWORKS: Record<string, string> = {
   Django: "Django 5.2 and Later",
 };
 
-const INSTRUCTIONS = `The Carnegie Mellon Web Kilt adds components and app conventions to CMU's web template (www.cmu.edu/common/standard-v6). Docs: https://webkilt.andrew.cmu.edu/.
+const instructions = (
+  docsUrl: string,
+) => `The Carnegie Mellon Web Kilt adds components and app conventions to CMU's web template (www.cmu.edu/common/standard-v6). Docs: ${lineDocs(docsUrl, "0")}.
+
+The major version is the CMU template generation: 0.x is for the current template, the only one so far, and its docs are under /0/. A later 1.x will cover the next template, with docs under /1/. Match the line to the site's template, and don't move a 0.x site to 1.x as an upgrade.
 
 Use it like this:
 - Set up: get_install for the project's setup. Load CMU's template first, then the kit (cmu-cms.css, then cmu-app.css for apps), then the project's own styles. Pin one exact kit version; production apps keep a local copy.
@@ -43,12 +47,14 @@ Use it like this:
 - Write text: get_conventions (AP style, Title Case for headings and buttons, links go somewhere and buttons do something).
 - Before finishing: check_html on the pages you changed.
 
-Every tool takes an optional version (like 0.4.0); it defaults to the latest release.`;
+Every tool takes a version (like 0.6.8). Pass the exact release the project pins; for a new project, pin the newest 0.x release and use it from then on. Leaving it out uses the newest release of any line, which is only for a quick look.`;
 
 const version = z
   .string()
   .optional()
-  .describe('A kit release, like "0.4.0". Defaults to the latest.');
+  .describe(
+    'The kit release the project pins, like "0.6.8". Leaving it out uses the newest release of any line.',
+  );
 
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false } as const;
 
@@ -174,7 +180,7 @@ export function describeComponent(kit: Kit, c: Component): string {
 export function createServer(source: KitSource): McpServer {
   const server = new McpServer(
     { name: "cmu-web-kilt", title: "Carnegie Mellon Web Kilt", version: pkg.version },
-    { instructions: INSTRUCTIONS },
+    { instructions: instructions(source.docsUrl) },
   );
 
   server.registerTool(

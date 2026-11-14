@@ -53,6 +53,10 @@ const RESOLVE = `https://data.jsdelivr.com/v1/packages/gh/${REPO}/resolved`;
 export const FIRST_VERSION = "0.3.0";
 const LATEST_TTL = 60 * 60 * 1000;
 
+/** The hosted docs. Each template line's docs are under its number: 0.x
+ * releases at 0/, 1.x at 1/. */
+export const DEFAULT_DOCS_URL = "https://webkilt.andrew.cmu.edu/";
+
 export class KitError extends Error {}
 
 const defaultFetch: Fetcher = async (url) => {
@@ -64,6 +68,23 @@ const defaultFetch: Fetcher = async (url) => {
 export function compareVersions(a: string, b: string): number {
   const [x, y] = [a, b].map((v) => v.split(".").map(Number));
   return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+}
+
+/** A release's line's docs: the docs URL plus the major version */
+export function lineDocs(docsUrl: string, version: string): string {
+  return `${docsUrl.replace(/\/*$/, "/")}${version.split(".")[0]}/`;
+}
+
+/** A release's doc links, moved under docs. kit.json through 0.6.7 links to
+ * the site's root, from before the lines; later ones may name another host. */
+export function relink(data: KitData, docs: string): KitData {
+  const move = (url: string) =>
+    url.startsWith(data.docs) ? docs + url.slice(data.docs.length) : url;
+  return {
+    ...data,
+    docs,
+    components: data.components.map((c) => ({ ...c, url: move(c.url) })),
+  };
 }
 
 /** Class names in a stylesheet that start with cmu- */
@@ -83,6 +104,8 @@ export class KitSource {
   constructor(
     private fetchText: Fetcher = defaultFetch,
     private now: () => number = Date.now,
+    /** Where the docs are served, set by DOCS_URL on the hosted server */
+    readonly docsUrl: string = DEFAULT_DOCS_URL,
   ) {}
 
   /** The newest release's version, checked at most once an hour */
@@ -101,7 +124,7 @@ export class KitSource {
       throw new KitError(`"${version}" isn't a version. Use one like 0.4.0, or "latest".`);
     if (compareVersions(v, FIRST_VERSION) < 0)
       throw new KitError(
-        `This server knows ${FIRST_VERSION} and later. For ${v}, see the docs at https://webkilt.andrew.cmu.edu/.`,
+        `This server knows ${FIRST_VERSION} and later. For ${v}, see the docs at ${lineDocs(this.docsUrl, v)}.`,
       );
     let kit = this.kits.get(v);
     if (!kit) {
@@ -124,7 +147,7 @@ export class KitSource {
       this.fetchText(`${base}/css/cmu-app.css`),
       this.fetchText(`${base}/js/cmu-app.js`),
     ]);
-    const data = JSON.parse(json) as KitData;
+    const data = relink(JSON.parse(json) as KitData, lineDocs(this.docsUrl, v));
     return {
       ...data,
       cssClasses: new Set([...classesIn(cms), ...classesIn(app)]),

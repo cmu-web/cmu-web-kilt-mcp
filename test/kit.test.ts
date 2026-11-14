@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KitSource, classesIn, compareVersions, hooksIn } from "../src/kit";
+import { KitSource, classesIn, compareVersions, hooksIn, lineDocs } from "../src/kit";
 import { fakeCdn } from "./helpers";
 
 describe("KitSource", () => {
@@ -34,6 +34,23 @@ describe("KitSource", () => {
     await expect(source.get("9.9.9")).rejects.toThrow(/no kit release 9\.9\.9/);
   });
 
+  it("links each release to its line's docs", async () => {
+    const kit = await new KitSource(fakeCdn().fetch).get("0.5.0");
+    expect(kit.docs).toBe("https://webkilt.andrew.cmu.edu/0/");
+    expect(kit.components.find((c) => c.id === "account")?.url).toBe(
+      "https://webkilt.andrew.cmu.edu/0/accounts.html#account",
+    );
+    expect(kit.components.every((c) => c.url.startsWith(kit.docs))).toBe(true);
+  });
+
+  it("serves the docs from DOCS_URL", async () => {
+    const source = new KitSource(fakeCdn().fetch, Date.now, "http://localhost:8080");
+    const kit = await source.get("0.4.0");
+    expect(kit.docs).toBe("http://localhost:8080/0/");
+    expect(kit.components.every((c) => c.url.startsWith("http://localhost:8080/0/"))).toBe(true);
+    await expect(source.get("0.2.7")).rejects.toThrow("http://localhost:8080/0/");
+  });
+
   it("tries again after a failed load", async () => {
     let fail = true;
     const cdn = fakeCdn();
@@ -51,6 +68,12 @@ describe("helpers", () => {
   it("compares versions", () => {
     expect(compareVersions("0.10.0", "0.9.9")).toBeGreaterThan(0);
     expect(compareVersions("0.3.0", "0.3.0")).toBe(0);
+  });
+  it("names a line's docs", () => {
+    expect(lineDocs("https://webkilt.andrew.cmu.edu/", "0.6.8")).toBe(
+      "https://webkilt.andrew.cmu.edu/0/",
+    );
+    expect(lineDocs("https://example.edu", "1.0.0")).toBe("https://example.edu/1/");
   });
   it("finds classes and hooks", () => {
     expect([...classesIn(".cmu-a, #x .cmu-b:hover{} .other{}")]).toEqual(["cmu-a", "cmu-b"]);

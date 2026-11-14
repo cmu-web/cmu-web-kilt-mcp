@@ -31,11 +31,16 @@ the image; omit Podman's `--format docker` flag with Docker.
 
 ## Configuration
 
-| Variable   | Default   | Purpose                                |
-| ---------- | --------- | -------------------------------------- |
-| `PORT`     | `3000`    | Listening port inside the container    |
-| `HOST`     | `0.0.0.0` | Listening address inside the container |
-| `MCP_PATH` | `/mcp`    | Exact path accepting MCP POST requests |
+| Variable   | Default                           | Purpose                                        |
+| ---------- | --------------------------------- | ---------------------------------------------- |
+| `PORT`     | `3000`                            | Listening port inside the container            |
+| `HOST`     | `0.0.0.0`                         | Listening address inside the container         |
+| `MCP_PATH` | `/mcp`                            | Exact path accepting MCP POST requests         |
+| `DOCS_URL` | `https://webkilt.andrew.cmu.edu/` | Where the docs are served, one line per number |
+
+The server links each release to its template line's docs, `DOCS_URL`
+plus the major version (e.g., `0/` for 0.x), whatever URLs the release's
+`kit.json` has.
 
 Pass settings with `-e NAME=value`. Keep the container-side port mapping
 and proxy route consistent with any changes. Leave `HOST` reachable from

@@ -91,7 +91,7 @@ implemented here passed; review the rendered page in a browser too.
 
 Use `npm run lint:fix` and `npm run format` to apply fixes, then review the
 diff. `npm run lint` and `npm run format:check` check without modifying files.
-Follow the kit's [writing conventions](https://webkilt.andrew.cmu.edu/conventions.html)
+Follow the kit's [writing conventions](https://webkilt.andrew.cmu.edu/0/conventions.html)
 for prose and examples.
 
 The hooks installed during setup run linting, formatting, type checking
