@@ -99,7 +99,8 @@ export function hooksIn(js: string): Set<string> {
 
 export class KitSource {
   private kits = new Map<string, Promise<Kit>>();
-  private latest?: { version: string; at: number };
+  /** Newest release per specifier ("" for any line, "0" for line 0) */
+  private latest = new Map<string, { version: string; at: number }>();
 
   constructor(
     private fetchText: Fetcher = defaultFetch,
@@ -108,20 +109,35 @@ export class KitSource {
     readonly docsUrl: string = DEFAULT_DOCS_URL,
   ) {}
 
-  /** The newest release's version, checked at most once an hour */
-  async latestVersion(): Promise<string> {
-    if (this.latest && this.now() - this.latest.at < LATEST_TTL) return this.latest.version;
-    const body = JSON.parse(await this.fetchText(RESOLVE)) as { version?: string | null };
-    if (!body.version) throw new KitError("Couldn't find the kit's latest release.");
-    this.latest = { version: body.version, at: this.now() };
+  /** The newest release, of one line ("0") or of any line, checked at most
+   * once an hour */
+  async latestVersion(line = ""): Promise<string> {
+    const cached = this.latest.get(line);
+    if (cached && this.now() - cached.at < LATEST_TTL) return cached.version;
+    const url = line ? `${RESOLVE}?specifier=${line}` : RESOLVE;
+    const body = JSON.parse(await this.fetchText(url)) as { version?: string | null };
+    if (!body.version)
+      throw new KitError(
+        line ? `There's no ${line}.x release yet.` : "Couldn't find the kit's newest release.",
+      );
+    this.latest.set(line, { version: body.version, at: this.now() });
     return body.version;
   }
 
-  /** The kit at a version ("latest" or omitted for the newest release) */
+  /** The kit at a version: an exact release ("0.6.9"), a line ("0.x" or "0")
+   * for its newest release, or omitted ("latest") for the newest of any line */
   async get(version?: string): Promise<Kit> {
-    const v = !version || version === "latest" ? await this.latestVersion() : version;
+    const line = /^(\d+)(\.x)?$/.exec(version ?? "")?.[1];
+    const v =
+      !version || version === "latest"
+        ? await this.latestVersion()
+        : line !== undefined
+          ? await this.latestVersion(line)
+          : version;
     if (!/^\d+\.\d+\.\d+$/.test(v))
-      throw new KitError(`"${version}" isn't a version. Use one like 0.4.0, or "latest".`);
+      throw new KitError(
+        `"${version}" isn't a version. Pass the release your project pins, like 0.6.9, or a line, like 0.x, for that line's newest release.`,
+      );
     if (compareVersions(v, FIRST_VERSION) < 0)
       throw new KitError(
         `This server knows ${FIRST_VERSION} and later. For ${v}, see the docs at ${lineDocs(this.docsUrl, v)}.`,

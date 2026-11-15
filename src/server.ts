@@ -47,13 +47,13 @@ Use it like this:
 - Write text: get_conventions (AP style, Title Case for headings and buttons, links go somewhere and buttons do something).
 - Before finishing: check_html on the pages you changed.
 
-Every tool takes a version (like 0.6.8). Pass the exact release the project pins; for a new project, pin the newest 0.x release and use it from then on. Leaving it out uses the newest release of any line, which is only for a quick look.`;
+Every tool takes a version. Pass the exact release the project pins (like 0.6.9). For a new project, pass the line for its template, 0.x for the current one; the result names the newest release in that line, so pin that one. Leaving it out uses the newest release of any line, which is only for a quick look.`;
 
 const version = z
   .string()
   .optional()
   .describe(
-    'The kit release the project pins, like "0.6.8". Leaving it out uses the newest release of any line.',
+    'The kit release the project pins, like "0.6.9", or a line, like "0.x", for its newest release. Leaving it out uses the newest release of any line.',
   );
 
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false } as const;

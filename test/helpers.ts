@@ -13,7 +13,11 @@ export function fakeCdn(latest = "0.4.0"): { fetch: Fetcher; calls: string[] } {
   const calls: string[] = [];
   const fetch: Fetcher = async (url) => {
     calls.push(url);
-    if (url.includes("/resolved")) return JSON.stringify({ version: latest });
+    if (url.includes("/resolved")) {
+      // A line's newest release; only line 0 has releases here
+      const line = /specifier=(\d+)/.exec(url)?.[1];
+      return JSON.stringify({ version: line && line !== latest.split(".")[0] ? null : latest });
+    }
     const m = /cmu-web-kilt@([\d.]+)\/(.+)$/.exec(url);
     if (!m || !["0.4.0", "0.5.0"].includes(m[1])) throw new Error(`404 ${url}`);
     const file = m[2].split("/").pop()!;

@@ -27,9 +27,20 @@ describe("KitSource", () => {
     expect(cdn.calls.filter((u) => u.includes("/resolved"))).toHaveLength(2);
   });
 
+  it("finds a line's newest release", async () => {
+    const cdn = fakeCdn();
+    const source = new KitSource(cdn.fetch);
+    expect((await source.get("0.x")).version).toBe("0.4.0");
+    expect((await source.get("0")).version).toBe("0.4.0");
+    expect(cdn.calls.filter((u) => u.includes("specifier=0"))).toHaveLength(1);
+    await expect(source.get("1.x")).rejects.toThrow(/no 1\.x release yet/);
+  });
+
   it("explains versions it can't serve", async () => {
     const source = new KitSource(fakeCdn().fetch);
-    await expect(source.get("latest-ish")).rejects.toThrow(/isn't a version/);
+    await expect(source.get("latest-ish")).rejects.toThrow(
+      /isn't a version. Pass the release your project pins/,
+    );
     await expect(source.get("0.2.7")).rejects.toThrow(/0\.3\.0 and later/);
     await expect(source.get("9.9.9")).rejects.toThrow(/no kit release 9\.9\.9/);
   });
