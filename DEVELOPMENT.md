@@ -35,6 +35,7 @@ release's data on the first tool call that asks for it, not at startup.
 | Release loading, latest-version resolution or caching | `src/kit.ts`                                      |
 | HTML findings                                         | `src/check.ts`                                    |
 | React markup conversion                               | `src/jsx.ts`                                      |
+| Astro markup conversion                               | `src/astro.ts`                                    |
 | HTTP routing and request handling                     | `src/http.ts`                                     |
 | Hosted startup or the command-line entry point        | `src/index.ts` and `src/cli.ts`                   |
 | Tests and released kit samples                        | `test/`                                           |
@@ -59,7 +60,11 @@ live with no server deployment, as long as its data format stays compatible.
 
 Framework-specific notes come from release data when available. The server
 also has fallback guidance for older releases and converts generic example
-markup to JSX for React. Keep both paths working when changing the output.
+markup to JSX for React and to Astro (braces in text escaped, scripts and
+styles kept as written); Astro is offered for every release, since its form
+is mechanical. `src/jsx.ts` and `src/astro.ts` copy the kit's own
+conversions in `docs/js/docs.js`; keep them the same. Keep both paths
+working when changing the output.
 
 ## Check a Change
 

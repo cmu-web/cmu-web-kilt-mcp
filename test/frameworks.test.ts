@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { toAstro } from "../src/astro";
 import { toJsx } from "../src/jsx";
 import { connect, textOf } from "./helpers";
 
@@ -28,7 +29,40 @@ describe("toJsx", () => {
   });
 });
 
+describe("toAstro", () => {
+  it("leaves HTML as it is", () => {
+    const html = '<label for="a" class="b">A</label><input id="a" value="ac00" checked>';
+    expect(toAstro(html)).toBe(html);
+  });
+  it("escapes braces in text but not in attributes or comments", () => {
+    expect(toAstro('<p title="{x}">Use {a} and }</p><!-- {c} -->')).toBe(
+      '<p title="{x}">Use {"{"}a{"}"} and {"}"}</p><!-- {c} -->',
+    );
+  });
+  it("keeps scripts and styles as written", () => {
+    expect(toAstro("<script>if (a) { b(); }</script><style>.a{color:red}</style>")).toBe(
+      "<script is:inline>if (a) { b(); }</script><style is:global>.a{color:red}</style>",
+    );
+    expect(toAstro('<script is:inline src="x.js"></script>')).toBe(
+      '<script is:inline src="x.js"></script>',
+    );
+  });
+});
+
 describe("frameworks", () => {
+  it("gives Astro markup, even for releases from before the kit listed Astro", async () => {
+    const client = await connect();
+    const out = textOf(
+      await client.callTool({
+        name: "get_component",
+        arguments: { id: "field-button", framework: "astro", version: "0.5.0" },
+      }),
+    );
+    expect(out).toMatch(/## In Astro 4 and Later/);
+    expect(out).toMatch(/Nothing more to do in Astro: use this markup in a page or component/);
+    expect(out).toMatch(/```astro\n[^`]*class="cmu-field-button"/);
+  });
+
   it("gives a component's written framework steps", async () => {
     const client = await connect();
     const out = textOf(
@@ -74,7 +108,7 @@ describe("frameworks", () => {
       arguments: { id: "sort", framework: "Angular", version: "0.5.0" },
     });
     expect(res.isError).toBe(true);
-    expect(textOf(res)).toMatch(/covers React, Svelte, Vue, Rails, Django/);
+    expect(textOf(res)).toMatch(/covers React, Svelte, Vue, Rails, Django, Astro/);
   });
 
   it("reads setups from the release, the new framework ones included", async () => {

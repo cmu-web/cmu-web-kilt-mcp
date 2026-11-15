@@ -5,6 +5,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
 import { checkHtml } from "./check";
+import { toAstro } from "./astro";
 import { toJsx } from "./jsx";
 import { KitError, KitSource, lineDocs, type Component, type Kit } from "./kit";
 
@@ -31,9 +32,16 @@ const FRAMEWORKS: Record<string, string> = {
   React: "React 18 and 19",
   Svelte: "Svelte 5",
   Vue: "Vue 3",
+  Astro: "Astro 4 and Later",
   Rails: "Rails 7.2 and Later",
   Django: "Django 5.2 and Later",
 };
+// Astro's form is the HTML with braces escaped, so every release has it,
+// including ones from before the kit listed Astro
+function frameworksOf(kit: Kit): Record<string, string> {
+  const listed = kit.frameworks ?? FRAMEWORKS;
+  return "Astro" in listed ? listed : { ...listed, Astro: FRAMEWORKS.Astro };
+}
 
 const instructions = (
   docsUrl: string,
@@ -43,7 +51,7 @@ The major version is the CMU template generation: 0.x is for the current templat
 
 Use it like this:
 - Set up: get_install for the project's setup. Load CMU's template first, then the kit (cmu-cms.css, then cmu-app.css for apps), then the project's own styles. Pin one exact kit version; production apps keep a local copy.
-- Build pages: search_components, then get_component for its markup (give it the framework, React, Svelte, Vue, Rails or Django, for that framework's form). Use the template's and the kit's classes instead of writing new CSS for what they already have. Components labeled App use cmu-app on <body>; Script ones use cmu-app.js at the end of <body>.
+- Build pages: search_components, then get_component for its markup (give it the framework, React, Svelte, Vue, Astro, Rails or Django, for that framework's form). Use the template's and the kit's classes instead of writing new CSS for what they already have. Components labeled App use cmu-app on <body>; Script ones use cmu-app.js at the end of <body>.
 - Write text: get_conventions (AP style, Title Case for headings and buttons, links go somewhere and buttons do something).
 - Before finishing: check_html on the pages you changed.
 
@@ -130,7 +138,9 @@ function frameworkText(name: string, c: Component): string {
     ? "Nothing more to do in Rails: use this markup in a view."
     : name === "Django"
       ? "Nothing more to do in Django: use this markup in a template."
-      : `Nothing more to do in ${name}: use this markup in a component.`;
+      : name === "Astro"
+        ? "Nothing more to do in Astro: use this markup in a page or component."
+        : `Nothing more to do in ${name}: use this markup in a component.`;
   if (c.labels.includes("App")) text += " The page's <body> has the cmu-app class.";
   if (c.labels.includes("Script"))
     text += rails
@@ -140,11 +150,17 @@ function frameworkText(name: string, c: Component): string {
   return text;
 }
 
-const LANGS: Record<string, string> = { React: "jsx", Svelte: "svelte", Vue: "vue", Rails: "erb" };
+const LANGS: Record<string, string> = {
+  React: "jsx",
+  Svelte: "svelte",
+  Vue: "vue",
+  Astro: "astro",
+  Rails: "erb",
+};
 
 /** A component in a framework, as the docs' Framework tab has it */
 export function describeFramework(kit: Kit, c: Component, name: string): string {
-  const known = kit.frameworks ?? FRAMEWORKS;
+  const known = frameworksOf(kit);
   const note = c.frameworks?.[name];
   const lines = [
     "",
@@ -154,7 +170,7 @@ export function describeFramework(kit: Kit, c: Component, name: string): string 
   ];
   const code = note?.code
     ? [note.code]
-    : c.examples.map((ex) => (name === "React" ? toJsx(ex) : ex));
+    : c.examples.map((ex) => (name === "React" ? toJsx(ex) : name === "Astro" ? toAstro(ex) : ex));
   for (const ex of code) lines.push("", "```" + (LANGS[name] ?? "html"), ex, "```");
   return lines.join("\n");
 }
@@ -233,7 +249,7 @@ export function createServer(source: KitSource): McpServer {
     {
       title: "Get a Component",
       description:
-        "One component's full description, what it requires (its labels), its classes and example markup to copy. With a framework, also how to use it there, with the markup in that framework's form (JSX for React).",
+        "One component's full description, what it requires (its labels), its classes and example markup to copy. With a framework, also how to use it there, with the markup in that framework's form (JSX for React, braces escaped for Astro).",
       inputSchema: {
         id: z
           .string()
@@ -241,7 +257,7 @@ export function createServer(source: KitSource): McpServer {
         framework: z
           .string()
           .optional()
-          .describe("React, Svelte, Vue, Rails or Django: the project's framework."),
+          .describe("React, Svelte, Vue, Astro, Rails or Django: the project's framework."),
         version,
       },
       annotations: READ_ONLY,
@@ -251,7 +267,7 @@ export function createServer(source: KitSource): McpServer {
         const kit = await source.get(v);
         const c = find(kit, id);
         if (c && framework) {
-          const known = Object.keys(kit.frameworks ?? FRAMEWORKS);
+          const known = Object.keys(frameworksOf(kit));
           const name = known.find((f) => f.toLowerCase() === framework.trim().toLowerCase());
           if (!name)
             return {
