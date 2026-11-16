@@ -35,6 +35,9 @@ export interface KitData {
   components: Component[];
   install: Record<string, string[]>;
   conventions: Convention[];
+  /** Link Previews / Open Graph, by section (0.7.0 and later; before, the
+   * Open Graph Tags component) */
+  previews?: Convention[];
 }
 
 export interface Kit extends KitData {

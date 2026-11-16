@@ -53,6 +53,7 @@ Use it like this:
 - Set up: get_install for the project's setup. Load CMU's template first, then the kit (cmu-cms.css, then cmu-app.css for apps), then the project's own styles. Pin one exact kit version; production apps keep a local copy.
 - Build pages: search_components, then get_component for its markup (give it the framework, React, Svelte, Vue, Astro, Rails or Django, for that framework's form). Use the template's and the kit's classes instead of writing new CSS for what they already have. Components labeled App use cmu-app on <body>; Script ones use cmu-app.js at the end of <body>.
 - Write text: get_conventions (AP style, Title Case for headings and buttons, links go somewhere and buttons do something).
+- Link previews: get_conventions with the topic "link previews", for the Open Graph tags in <head> and the site's preview image.
 - Before finishing: check_html on the pages you changed.
 
 Every tool takes a version. Pass the exact release the project pins (like 0.6.9). For a new project, pass the line for its template, 0.x for the current one; the result names the newest release in that line, so pin that one. Leaving it out uses the newest release of any line, which is only for a quick look.`;
@@ -193,6 +194,24 @@ export function describeComponent(kit: Kit, c: Component): string {
   return lines.join("\n");
 }
 
+/** A topic or search about link previews and Open Graph tags */
+const PREVIEW_WORDS =
+  /\b(link )?previews?\b|open ?graph|\bog\b|og:|social (media )?(card|image)|share (card|image)/i;
+
+/** The Link Previews sections as plain text; the tag example's lines, which
+ * kit.json joins, go back on lines of their own */
+function previewsText(kit: Kit): string {
+  return [
+    `Link Previews / Open Graph, kit ${kit.version} (${kit.docs}previews.html)`,
+    ...(kit.previews ?? []).flatMap((c) => [
+      "",
+      `## ${plain(c.heading)}`,
+      "",
+      plain(c.text).replace(/> (?=<meta )/g, ">\n"),
+    ]),
+  ].join("\n");
+}
+
 export function createServer(source: KitSource): McpServer {
   const server = new McpServer(
     { name: "cmu-web-kilt", title: "Carnegie Mellon Web Kilt", version: pkg.version },
@@ -224,13 +243,24 @@ export function createServer(source: KitSource): McpServer {
           .map((c) => ({ c, score: words.length ? matches(c, words) : 1 }))
           .filter((h) => h.score > 0)
           .sort((a, b) => b.score - a.score);
+        // Link previews are a page's setup, not a component, from 0.7.0 on
+        const previews =
+          query && PREVIEW_WORDS.test(query) && kit.previews?.length
+            ? 'For a page\'s link preview (Open Graph tags and the preview image), use get_conventions with the topic "link previews".'
+            : "";
         if (!hits.length)
           return text(
-            `No components in kit ${kit.version} match${query ? ` "${query}"` : ""}${label ? ` with the ${label} label` : ""}. Try fewer or different words, or search with no query to list them all.`,
+            [
+              `No components in kit ${kit.version} match${query ? ` "${query}"` : ""}${label ? ` with the ${label} label` : ""}. Try fewer or different words, or search with no query to list them all.`,
+              previews,
+            ]
+              .filter(Boolean)
+              .join("\n\n"),
           );
         return text(
           [
             `${hits.length} of ${kit.components.length} components in kit ${kit.version}. Use get_component with an id for its markup.`,
+            ...(previews ? ["", previews] : []),
             "",
             ...hits.map(
               ({ c }) =>
@@ -358,7 +388,7 @@ export function createServer(source: KitSource): McpServer {
     {
       title: "Get Conventions",
       description:
-        "The kit's rules for class names, writing (AP style, Title Case, names), headings, links and buttons, messages, colors, images and accessibility.",
+        'The kit\'s rules for class names, writing (AP style, Title Case, names), headings, links and buttons, messages, colors, images and accessibility. The topic "link previews" gives the Open Graph tags and the preview image.',
       inputSchema: {
         topic: z
           .string()
@@ -372,13 +402,20 @@ export function createServer(source: KitSource): McpServer {
       try {
         const kit = await source.get(v);
         const key = topic?.trim().toLowerCase();
+        if (key && PREVIEW_WORDS.test(key)) {
+          if (!kit.previews?.length)
+            return text(
+              `Kit ${kit.version} has link previews as a component: search_components with "Open Graph", then get_component.`,
+            );
+          return text(previewsText(kit));
+        }
         const picked = key
           ? kit.conventions.filter((c) => c.id === key || c.heading.toLowerCase().includes(key))
           : kit.conventions;
         if (!picked.length)
           return {
             ...text(
-              `No convention matches "${topic}". Topics: ${kit.conventions.map((c) => c.heading).join(", ")}.`,
+              `No convention matches "${topic}". Topics: ${kit.conventions.map((c) => c.heading).join(", ")}${kit.previews?.length ? ", Link Previews" : ""}.`,
             ),
             isError: true,
           };
@@ -386,6 +423,12 @@ export function createServer(source: KitSource): McpServer {
           [
             `Conventions, kit ${kit.version} (${kit.docs}conventions.html)`,
             ...picked.flatMap((c) => ["", `## ${plain(c.heading)}`, "", plain(c.text)]),
+            ...(!key && kit.previews?.length
+              ? [
+                  "",
+                  'Link previews and Open Graph tags: get_conventions with the topic "link previews".',
+                ]
+              : []),
           ].join("\n"),
         );
       } catch (e) {

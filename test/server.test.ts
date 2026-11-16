@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { connect, textOf } from "./helpers";
+import { KitSource } from "../src/kit";
+import { connect, fakeCdn, textOf } from "./helpers";
 
 describe("tools", () => {
   it("lists five read-only tools and a prompt", async () => {
@@ -101,5 +102,62 @@ describe("tools", () => {
     });
     expect(res.isError).toBe(true);
     expect(textOf(res)).toMatch(/0\.3\.0 and later/);
+  });
+});
+
+describe("link previews", () => {
+  // 0.5.0's files, with a kit.json that has 0.7.0's previews
+  const withPreviews = () => {
+    const { fetch } = fakeCdn("0.5.0");
+    return new KitSource(async (url) => {
+      const body = await fetch(url);
+      if (!url.endsWith("/docs/kit.json")) return body;
+      const data = JSON.parse(body);
+      data.previews = [
+        { id: "what", heading: "What People See", text: "- Title: Name the page and the site." },
+        {
+          id: "tags",
+          heading: "Open Graph Tags",
+          text: 'Add the tags:\n<meta property="og:title" content="A"> <meta property="og:image" content="B">',
+        },
+      ];
+      return JSON.stringify(data);
+    });
+  };
+
+  it("serves them as a conventions topic, the tags on their own lines", async () => {
+    const client = await connect(withPreviews());
+    for (const topic of ["link previews", "Open Graph", "og tags"]) {
+      const out = textOf(
+        await client.callTool({ name: "get_conventions", arguments: { topic, version: "0.5.0" } }),
+      );
+      expect(out).toMatch(/^Link Previews \/ Open Graph, kit 0\.5\.0/);
+      expect(out).toMatch(/## Open Graph Tags/);
+      expect(out).toContain('<meta property="og:title" content="A">\n<meta property="og:image"');
+    }
+  });
+
+  it("points to the topic from all conventions and from a search", async () => {
+    const client = await connect(withPreviews());
+    const all = textOf(
+      await client.callTool({ name: "get_conventions", arguments: { version: "0.5.0" } }),
+    );
+    expect(all).not.toMatch(/## Open Graph Tags/);
+    expect(all).toMatch(/topic "link previews"/);
+    const search = textOf(
+      await client.callTool({
+        name: "search_components",
+        arguments: { query: "open graph", version: "0.5.0" },
+      }),
+    );
+    expect(search).toMatch(/get_conventions with the topic "link previews"/);
+  });
+
+  it("sends older releases to their component", async () => {
+    const client = await connect();
+    const out = textOf(
+      await client.callTool({ name: "get_conventions", arguments: { topic: "link previews" } }),
+    );
+    expect(out).toMatch(/as a component: search_components with "Open Graph"/);
   });
 });
