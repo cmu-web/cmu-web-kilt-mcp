@@ -107,7 +107,7 @@ clears process caches but does not change a release's files on the CDN.
 
 ## Publish and Roll Out a Release
 
-The [workflow](.github/workflows/publish.yml) checks and builds on pushes
+The [Publish Image workflow](.github/workflows/publish-image.yml) checks and builds on pushes
 to `main`, pull requests, version tags and manual runs. It publishes the
 image only for version tags, such as `0.3.0`, and manual runs, after checks
 pass.
