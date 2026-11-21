@@ -1,18 +1,22 @@
 # Development
 
-This server turns the Web Kilt's released documentation into MCP tool
-responses. Work here when changing tool behavior, transport handling or
-markup checks. Change component examples and installation instructions in
-the [kit repository](https://github.com/cmu-web/cmu-web-kilt) instead.
+Set up your computer once with
+[Working on CMU Web Projects](https://github.com/cmu-web/.github/blob/main/DEVELOPMENT.md);
+this page covers this project's own commands.
 
-## Run a Local Server
+This server turns the Web Kilt's released documentation into MCP tool
+responses, in TypeScript on Node. Work here when changing tool behavior,
+transport handling or markup checks. Change component examples and
+installation instructions in the
+[kit repository](https://github.com/cmu-web/cmu-web-kilt) instead.
+
+## Build It
 
 Use the Node version in [the Dockerfile](Dockerfile) for development, then
 run these commands from the checkout:
 
 ```bash
 npm ci
-npx prek install
 npm run dev
 ```
 
@@ -66,45 +70,6 @@ is mechanical. `src/jsx.ts` and `src/astro.ts` copy the kit's own
 conversions in `docs/js/docs.js`; keep them the same. Keep both paths
 working when changing the output.
 
-## Check a Change
-
-Add or update a focused test for behavior changes, then run:
-
-```bash
-npm run check
-```
-
-This checks Node types against the Dockerfile, linting, formatting and
-TypeScript, then runs the tests and builds `dist/`. To reproduce the CI
-check in its own Node environment:
-
-```bash
-podman build --target test .
-```
-
-Tests use a fake CDN backed by samples in `test/fixtures/`, including
-releases before and after framework notes were added. They do not contact
-jsDelivr. HTTP tests bind local ports, so the environment must allow
-loopback connections.
-
-Test tool output through the MCP client helpers in `test/helpers.ts` when
-changing arguments or responses. Test `src/check.ts` findings separately
-from transport behavior. A clean markup check means only that the checks
-implemented here passed; review the rendered page in a browser too.
-
-### Formatting and Hooks
-
-Use `npm run lint:fix` and `npm run format` to apply fixes, then review the
-diff. `npm run lint` and `npm run format:check` check without modifying files.
-Follow the kit's [writing conventions](https://webkilt.andrew.cmu.edu/0/conventions.html)
-for prose and examples.
-
-The hooks installed during setup run linting, formatting, type checking
-and the Node types check when relevant. Run `npx prek run --all-files` to
-invoke them manually. Run the full check before submitting a pull request.
-Branch from `main`, keep the change focused and use Conventional Commits
-for commit subjects.
-
 ## Run It With an Agent
 
 Build the checkout:
@@ -132,21 +97,58 @@ Verify that the client discovers all five tools and can call
 `get_component` with an explicit kit version. Keep diagnostic logging on
 standard error for stdio; standard output carries the MCP protocol.
 
-## Prepare a Server Release
+## Check a Change
 
-The server version in `package.json` is independent of the kit releases it
+The everyday check is `npm run check`: it needs nothing beyond `npm ci` and
+no network access. It checks Node types against the Dockerfile, linting,
+formatting and TypeScript, then runs the tests and builds `dist/`. Add or
+update a focused test for a change in behavior.
+
+The Publish Image workflow runs the same check in the Dockerfile's `test`
+stage on every push and pull request. To run it that way, in its own Node
+environment (Podman takes the same command):
+
+```bash
+docker build --target test .
+```
+
+Tests use a fake CDN backed by samples in `test/fixtures/`, including
+releases before and after framework notes were added. They do not contact
+jsDelivr. HTTP tests bind local ports, so the environment must allow
+loopback connections.
+
+Test tool output through the MCP client helpers in `test/helpers.ts` when
+changing arguments or responses. Test `src/check.ts` findings separately
+from transport behavior. A clean markup check means only that the checks
+implemented here passed; review the rendered page in a browser too.
+
+### Formatting and Hooks
+
+Use `npm run lint:fix` and `npm run format` to apply fixes, then review the
+diff. `npm run lint` and `npm run format:check` check without modifying files.
+Follow the kit's [writing conventions](https://webkilt.andrew.cmu.edu/0/conventions.html)
+for prose and examples.
+
+Run the full check before submitting a pull request; see
+[Contributing](CONTRIBUTING.md).
+
+## Release
+
+The server's version in `package.json` is separate from the kit releases it
 reads. Start from an up-to-date `main` with passing CI and a clean working
-tree. Choose a major version for incompatible tool or transport changes,
-a minor version for additions or a patch for fixes.
-
-Use `npm version major`, `minor` or `patch` with a release message, for example:
+tree. Choose a major version for incompatible tool or transport changes, a
+minor version for additions or a patch for fixes, then run, e.g.:
 
 ```bash
 npm version patch -m "chore: release %s"
 ```
 
-This updates the manifest and lockfile, creates a local commit and creates
-an annotated tag named for the version, such as `0.3.0`, with no `v` prefix
-(set in `.npmrc`). Review them, then follow
-[Publish and Roll Out a Release](DEPLOYMENT.md#publish-and-roll-out-a-release).
-A kit documentation release alone doesn't require a server version bump.
+This updates the manifest and lockfile, makes a local commit and an
+annotated tag named for the version (e.g., `0.3.0`, with no `v`, set in
+`.npmrc`). Review them, then push `main` and the new tag together. The
+Publish Image workflow checks the tag and publishes its image; confirm it
+passed and record the image's digest. A manual run of the workflow publishes
+a commit's image without moving `latest`. Leave published tags intact; fix a
+bad release with a new version.
+
+A kit documentation release alone doesn't need a new server version.

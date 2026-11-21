@@ -1,16 +1,12 @@
 # Carnegie Mellon Web Kilt MCP Server
 
-**Give Your Agent the Kit's Own Docs**
-
-An MCP server that helps coding agents build with the
-[Carnegie Mellon Web Kilt](https://webkilt.andrew.cmu.edu/).
-It supplies installation steps, component markup, framework notes and
-writing conventions from the kit's releases, plus a check for common markup
+The Carnegie Mellon Web Kilt MCP server helps coding agents build with the
+[Carnegie Mellon Web Kilt](https://webkilt.andrew.cmu.edu/). It supplies
+installation steps, component markup, framework notes and writing
+conventions from the kit's releases, plus a check for common markup
 mistakes.
 
-**[Explore the Web Kilt](https://webkilt.andrew.cmu.edu/)** ·
-[Connect Your Agent](#connect-your-agent) ·
-[Work on the Server](DEVELOPMENT.md)
+Server: https://webkilt.andrew.cmu.edu/mcp
 
 ## Connect Your Agent
 
@@ -48,16 +44,3 @@ The MCP server's own version is separate from the kit version.
 The tools read public release data and check submitted HTML; they do not
 edit your project. Your coding agent makes the changes. The markup check
 supplements browser review and is not an accessibility audit.
-
-## Help Improve the Server
-
-[Report a problem or suggest a feature](https://github.com/cmu-web/cmu-web-kilt-mcp/issues).
-Include the tool, arguments, kit version and unexpected result.
-[Development](DEVELOPMENT.md) covers local setup, tests and the data flow;
-[Deployment](DEPLOYMENT.md) covers hosting and releases.
-
-## License
-
-Copyright Carnegie Mellon University. The server code uses the
-[BSD 3-Clause License](LICENSE). That license does not grant rights to
-CMU's names, marks, artwork or web template.
